@@ -168,6 +168,8 @@ canvas{max-width:100%;}
 .dia-toggle{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:600;cursor:pointer;}
 .dia-toggle.active{background:var(--navy);color:#fff;border-color:var(--navy);}
 
+.acciones-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.acciones-grid .btn-small{padding:13px 8px;font-size:13px;text-align:center;}
 .pizarra-token{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:grab;touch-action:none;user-select:none;z-index:5;padding:7px;margin:-7px;}
 .pizarra-token:active{cursor:grabbing;z-index:6;}
 
@@ -208,7 +210,7 @@ canvas{max-width:100%;}
 </head>
 <body>
 <div class="splash" id="splashScreen"><img src="logo-header.png" alt="Cadete A"></div>
-<div id="updateBanner" onclick="location.reload()" style="display:none;position:fixed;top:0;left:0;right:0;z-index:900;background:#D22630;color:#fff;text-align:center;padding:10px 14px calc(10px + env(safe-area-inset-top,0px));font-size:12.5px;font-weight:600;cursor:pointer;">🔄 Hay una versión más nueva — toca aquí para cargarla</div>
+<div id="updateBanner" onclick="actualizarApp()" style="display:none;position:fixed;top:0;left:0;right:0;z-index:900;background:#D22630;color:#fff;text-align:center;padding:10px 14px calc(10px + env(safe-area-inset-top,0px));font-size:12.5px;font-weight:600;cursor:pointer;">🔄 Hay una versión más nueva — toca aquí para cargarla</div>
 <div id="syncErrorBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:899;background:#8A5A00;color:#fff;text-align:center;padding:10px 14px calc(10px + env(safe-area-inset-top,0px));font-size:12px;font-weight:600;">⚠️ Sin sincronización con la nube — revisa la conexión o las reglas de Firebase (los datos se guardan solo en este dispositivo)</div>
 <div id="app">
   <header class="topbar">
@@ -491,7 +493,7 @@ canvas{max-width:100%;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '21/09/2026 - 09:10';
+const APP_VERSION = '05/11/2026 - 18:44';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -896,7 +898,7 @@ function activarSincronizacionEnVivo(){
   });
 
   document.addEventListener('visibilitychange', () => {
-    if(document.visibilityState === 'visible'){ refrescarDesdeFirebase(); comprobarVersion(); }
+    if(document.visibilityState === 'visible') refrescarDesdeFirebase();
   });
 }
 async function refrescarDesdeFirebase(){
@@ -907,13 +909,38 @@ async function refrescarDesdeFirebase(){
     if(remoto){ aplicarDatosRemotos(remoto); renderAll(); ocultarAvisoSync(); }
   }catch(e){ console.error('Error refrescando desde Firebase', e); mostrarAvisoSync(); }
 }
-async function comprobarVersion(){
+function leerSesion(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } }
+function guardarSesion(k, v){ try{ sessionStorage.setItem(k, v); }catch(e){} }
+let ultimaComprobacionVersion = 0;
+/* Comprueba si hay una versión nueva publicada. Al abrir la app (auto=true) se recarga sola con la
+   versión nueva, saltándose la copia que el móvil tenga guardada; en el resto de momentos (volver a
+   la app, cada 10 min) solo avisa con la franja roja, para no cortar lo que estés haciendo. */
+async function comprobarVersion(auto){
+  if(!auto && Date.now() - ultimaComprobacionVersion < 60000) return;
+  ultimaComprobacionVersion = Date.now();
   try{
     const res = await fetch('version.txt?t=' + Date.now(), {cache:'no-store'});
     if(!res.ok) return;
     const remota = (await res.text()).trim();
-    if(remota && remota !== APP_VERSION) document.getElementById('updateBanner').style.display = 'block';
+    if(!remota || remota === APP_VERSION) return;
+    const clave = 'cdsp_auto_update_' + remota;
+    const hayModalAbierto = !!document.querySelector('.modal-overlay:not(.hidden)');
+    if(auto && !hayModalAbierto && !leerSesion(clave)){
+      guardarSesion(clave, '1');
+      location.replace(location.pathname + '?v=' + encodeURIComponent(remota));
+      return;
+    }
+    document.getElementById('updateBanner').style.display = 'block';
   }catch(e){ /* sin conexión o archivo no disponible: no hacemos nada */ }
+}
+function actualizarApp(){
+  location.replace(location.pathname + '?v=' + Date.now());
+}
+function iniciarVigilanciaVersion(){
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') comprobarVersion(false); });
+  window.addEventListener('pageshow', (e) => { if(e.persisted) comprobarVersion(false); });
+  window.addEventListener('focus', () => comprobarVersion(false));
+  setInterval(() => comprobarVersion(false), 10 * 60 * 1000);
 }
 
 function renderAll(){
@@ -1180,24 +1207,56 @@ function renderCalendario(){
   let startWeekday = primerDia.getDay();
   startWeekday = startWeekday === 0 ? 7 : startWeekday;
 
-  const partidosPorDia = {};
-  state.partidos.forEach(p => {
-    const d = new Date(p.fecha+'T00:00:00');
-    if(d.getFullYear()===year && d.getMonth()===month) partidosPorDia[d.getDate()] = p;
-  });
+  const partidosPorFecha = {};
+  state.partidos.forEach(p => { (partidosPorFecha[p.fecha] = partidosPorFecha[p.fecha] || []).push(p); });
   const diasEntreno = state.config.diasEntreno || [1,3,5];
 
   let html = '';
   for(let i=1; i<startWeekday; i++) html += '<div class="cal-day empty"></div>';
   for(let day=1; day<=diasEnMes; day++){
     let weekday = new Date(year, month, day).getDay(); weekday = weekday===0?7:weekday;
-    const partido = partidosPorDia[day];
+    const fechaISO = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const delDia = partidosPorFecha[fechaISO] || [];
+    const partido = delDia[0];
     let cls = 'cal-day', label = '';
-    if(partido){ cls += ' cal-partido'; label = `<span class="cal-tag">${escapeHtml(partido.rival||'Partido')}</span>`; }
+    if(partido){ cls += ' cal-partido'; label = `<span class="cal-tag">${escapeHtml(partido.rival||'Partido')}${delDia.length>1?` +${delDia.length-1}`:''}</span>`; }
     else if(diasEntreno.includes(weekday)){ cls += ' cal-entreno'; }
-    html += `<div class="${cls}" ${partido?`onclick="abrirModalConvocatoria('${partido.id}')"`:''}><span class="cal-num">${day}</span>${label}</div>`;
+    html += `<div class="${cls}" ${partido?`onclick="abrirPartidosDia('${fechaISO}')"`:''}><span class="cal-num">${day}</span>${label}</div>`;
   }
   document.getElementById('calDays').innerHTML = html;
+}
+
+/* Al tocar un día con partido en el calendario: mismas acciones que en la lista */
+function abrirPartidosDia(fechaISO){
+  const delDia = state.partidos.filter(p => p.fecha === fechaISO);
+  if(delDia.length === 0) return;
+  if(delDia.length === 1){ abrirAccionesPartido(delDia[0].id); return; }
+  openModal(`
+    <h3>${formatDateLong(fechaISO)}</h3>
+    <p class="hint">Hay ${delDia.length} partidos este día. Elige uno:</p>
+    <div class="list-simple">
+      ${delDia.map(p => `<button type="button" class="list-row" style="width:100%;border:none;text-align:left;cursor:pointer" onclick="abrirAccionesPartido('${p.id}')"><span class="list-name"><strong>${escapeHtml(p.rival||'Partido')}</strong></span></button>`).join('')}
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cerrar</button></div>`);
+}
+function abrirAccionesPartido(id){
+  const p = state.partidos.find(x => x.id === id);
+  if(!p) return;
+  const jornadaTxt = p.jornada ? `J${p.jornada} · ` : '';
+  const localTxt = p.local===true ? 'Local' : (p.local===false ? 'Visitante' : '');
+  const nConv = Object.values(p.convocatoria||{}).filter(e => e.convocado).length;
+  const detalles = [formatDateLong(p.fecha), p.hora||'', localTxt, p.resultado ? `Resultado ${p.resultado}` : '', `${nConv} convocados`].filter(Boolean).join(' · ');
+  openModal(`
+    <h3>${jornadaTxt}${escapeHtml(p.rival || 'Partido')}</h3>
+    <p class="hint">${escapeHtml(detalles)}</p>
+    <div class="acciones-grid">
+      <button type="button" class="btn-small" onclick="abrirModalConvocatoria('${p.id}')">Convocatoria</button>
+      <button type="button" class="btn-small" onclick="abrirModalAlineacion('${p.id}')">Alineación</button>
+      <button type="button" class="btn-small" onclick="abrirModalResultado('${p.id}')">Resultado</button>
+      <button type="button" class="btn-small" onclick="abrirModalPartido('${p.id}')">Cambiar fecha y datos</button>
+      <button type="button" class="btn-small" onclick="generarConvocatoriaPDF('${p.id}')">PDF convocatoria</button>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cerrar</button></div>`);
 }
 
 function renderMinutosTab(){
@@ -1231,7 +1290,7 @@ function renderMinutosTab(){
         <div class="row-actions">
           <button class="btn-small" onclick="abrirModalConvocatoria('${p.id}')">Convocatoria</button>
           <button class="btn-small" onclick="abrirModalAlineacion('${p.id}')">Alineación</button>
-          <button class="btn-small" onclick="abrirModalPartidoEnVivo('${p.id}')">Directo</button>
+          <button class="btn-small" onclick="abrirModalResultado('${p.id}')">Resultado</button>
           <button class="icon-btn" onclick="abrirModalPartido('${p.id}')">✎</button>
           <button class="icon-btn" onclick="generarConvocatoriaPDF('${p.id}')">PDF</button>
           <button class="icon-btn danger" onclick="borrarPartido('${p.id}')">🗑</button>
@@ -1318,6 +1377,38 @@ async function borrarPartido(id){
   await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'borrar', id});
   renderMinutosTab();
   showToast('Partido eliminado.');
+}
+
+function abrirModalResultado(id){
+  const p = state.partidos.find(x => x.id === id);
+  if(!p) return;
+  const m = (p.resultado || '').match(/^\s*(\d+)\s*[-–:]\s*(\d+)\s*$/);
+  const favor = m ? m[1] : '', contra = m ? m[2] : '';
+  const textoLibre = (p.resultado && !m) ? `<p class="hint">Resultado guardado antes: <strong>${escapeHtml(p.resultado)}</strong>. Si pones goles aquí, lo sustituirá.</p>` : '';
+  openModal(`
+    <h3>Resultado · ${escapeHtml(p.rival || 'Partido')}</h3>
+    <p class="hint">Goles de cada equipo (el primer número es siempre el de C.D. San Pedro). Déjalo en blanco si todavía no se ha jugado.</p>
+    ${textoLibre}
+    <div class="form-grid">
+      <label>C.D. San Pedro<input type="number" id="mResFavor" min="0" inputmode="numeric" value="${favor}"></label>
+      <label>${escapeHtml(p.rival || 'Rival')}<input type="number" id="mResContra" min="0" inputmode="numeric" value="${contra}"></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="guardarResultado('${id}')">Guardar</button>
+    </div>`);
+}
+async function guardarResultado(id){
+  const p = state.partidos.find(x => x.id === id);
+  if(!p) return;
+  const favor = document.getElementById('mResFavor').value.trim();
+  const contra = document.getElementById('mResContra').value.trim();
+  if((favor === '') !== (contra === '')){ showToast('Rellena los goles de los dos equipos.'); return; }
+  p.resultado = favor === '' ? '' : `${parseInt(favor,10)}-${parseInt(contra,10)}`;
+  await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: p});
+  closeModal();
+  renderMinutosTab();
+  showToast(p.resultado ? 'Resultado guardado.' : 'Resultado borrado.');
 }
 
 function abrirModalConvocatoria(partidoId){
@@ -1569,16 +1660,29 @@ function abrirModalAlineacion(partidoId){
   openModal(`
     <h3>Alineación · ${escapeHtml(partido.rival||'Partido')}</h3>
     <label>Formación<select id="mAlinFormacion" onchange="cambiarFormacionAlineacion()">${formOpts}</select></label>
-    <p class="hint">Toca una posición para asignar o cambiar al jugador. Solo se puede elegir entre los convocados.</p>
+    <p class="hint">Toca una posición para asignar o cambiar al jugador. Solo se puede elegir entre los convocados. Los que pongas en el campo quedan como <strong>titulares</strong> y el resto de convocados como <strong>suplentes</strong>.</p>
     <div id="pitchContainer">${renderPitchHTML(partido.formacion, partido.alineacion, 'abrirSelectorPosicion')}</div>
     <div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cerrar</button></div>`);
+}
+/* Los que están en el once inicial pasan a titulares y el resto de convocados a suplentes.
+   Si no hay nadie colocado en el campo, la condición queda "sin decidir". */
+function sincronizarCondicionConAlineacion(partido){
+  const enOnce = new Set(Object.values(partido.alineacion || {}));
+  Object.keys(partido.convocatoria || {}).forEach(jid => {
+    const e = partido.convocatoria[jid];
+    if(!e || !e.convocado) return;
+    if(enOnce.has(jid)) e.condicion = 'titular';
+    else e.condicion = enOnce.size > 0 ? 'suplente' : null;
+  });
 }
 async function cambiarFormacionAlineacion(){
   const partido = state.partidos.find(p => p.id === window.__alinPartidoId);
   const nueva = document.getElementById('mAlinFormacion').value;
   if(nueva !== partido.formacion){
+    const habiaOnce = Object.keys(partido.alineacion || {}).length > 0;
     partido.formacion = nueva;
     partido.alineacion = {};
+    if(habiaOnce) sincronizarCondicionConAlineacion(partido);
     await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: partido});
     renderMinutosTab();
   }
@@ -1610,7 +1714,9 @@ async function asignarPosicion(slotId, jugadorId){
   if(!partido.alineacion) partido.alineacion = {};
   if(jugadorId) partido.alineacion[slotId] = jugadorId;
   else delete partido.alineacion[slotId];
+  sincronizarCondicionConAlineacion(partido);
   await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: partido});
+  renderMinutosTab();
   abrirModalAlineacion(window.__alinPartidoId);
 }
 
@@ -2550,7 +2656,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('modalOverlay').addEventListener('click', (e) => { if(e.target.id === 'modalOverlay') closeModal(); });
   init();
-  comprobarVersion();
+  comprobarVersion(true);
+  iniciarVigilanciaVersion();
 
   const splash = document.getElementById('splashScreen');
   setTimeout(() => splash.classList.add('hide'), 1300);
