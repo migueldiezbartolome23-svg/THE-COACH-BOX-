@@ -203,6 +203,109 @@ canvas{max-width:100%;}
 .cambios-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
 .cambio-item{background:var(--bg);border-radius:10px;padding:8px 10px;font-size:12.5px;}
 
+/* ---- Ficha de jugador, nombres pulsables y resultado/cambios ---- */
+.name-link{background:none;border:none;padding:0;font:inherit;color:var(--navy);font-weight:600;text-decoration:underline;text-decoration-color:rgba(210,38,48,.55);text-underline-offset:3px;cursor:pointer;text-align:left;}
+.fichas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ficha-chip{display:flex;align-items:center;gap:8px;background:var(--bg);border:none;border-radius:12px;padding:8px 10px;text-align:left;cursor:pointer;color:var(--text);min-width:0;}
+.ficha-chip .fc-text{display:flex;flex-direction:column;min-width:0;}
+.ficha-chip .fc-name{font-size:12.5px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ficha-chip .fc-sub{font-size:10.5px;color:var(--muted);}
+.ficha-page{position:fixed;inset:0;z-index:90;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.ficha-page.hidden{display:none;}
+body.ficha-open{overflow:hidden;}
+.ficha-top{position:sticky;top:0;z-index:2;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:12px;}
+.ficha-top strong{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em;font-size:15px;}
+.ficha-back{background:rgba(255,255,255,.14);border:none;color:#fff;border-radius:10px;padding:8px 12px;font-weight:600;font-size:13px;cursor:pointer;}
+.ficha-body{max-width:720px;margin:0 auto;padding:16px 16px calc(40px + env(safe-area-inset-bottom,0px));}
+.ficha-hero{display:flex;align-items:center;gap:14px;}
+.ficha-hero h2{font-size:22px;text-transform:uppercase;color:var(--navy);line-height:1.1;}
+.ficha-hero .muted{display:block;margin-top:4px;}
+.dorsal-badge.xl{width:76px;height:76px;font-size:28px;}
+.ficha-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.tile{background:var(--bg);border-radius:12px;padding:12px 6px;text-align:center;}
+.tile b{display:block;font-family:'Oswald',sans-serif;font-size:22px;color:var(--navy);font-weight:600;line-height:1.1;}
+.tile span{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.02em;}
+.tile.accent b{color:var(--red);}
+.pj-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.pj-row:last-child{border-bottom:none;}
+.pj-date{font-size:11px;color:var(--muted);width:40px;flex-shrink:0;}
+.pj-main{flex:1;min-width:0;}
+.pj-main strong{font-size:13px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pj-main small{font-size:11px;color:var(--muted);}
+.pj-min{font-family:'Oswald',sans-serif;font-size:18px;color:var(--navy);min-width:44px;text-align:right;}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.02em;flex-shrink:0;}
+.badge.tit{background:var(--navy);color:#fff;}
+.badge.sup{background:var(--red);color:#fff;}
+.badge.nc{background:#E4E6EC;color:var(--muted);}
+.badge.sd{background:#FFF4E5;color:#8A5A00;}
+.res-sub{font-family:'Oswald',sans-serif;font-size:13px;text-transform:uppercase;color:var(--navy);margin:18px 0 8px;letter-spacing:.03em;}
+.cambio-row{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:6px 6px 6px 10px;font-size:12.5px;margin-bottom:6px;}
+.cambio-row span{flex:1;}
+.res-min-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.res-min-row.manual .min-input{border-color:var(--red);background:#FFF5F5;}
+.res-reset{display:none;}
+.res-min-row.manual .res-reset{display:inline-block;color:var(--red);}
+.res-total{font-size:11.5px;color:var(--muted);margin:8px 0;}
+
+/* ---- Votación de capitanes ---- */
+.cap-count{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--muted);margin:6px 0 4px;}
+.cap-count b{font-family:'Oswald',sans-serif;font-size:22px;color:var(--red);font-weight:600;}
+.cap-bar{height:8px;border-radius:99px;background:var(--bg);overflow:hidden;margin-bottom:12px;}
+.cap-bar>i{display:block;height:100%;background:var(--red);width:0;transition:width .3s ease;}
+.cap-res{display:grid;grid-template-columns:22px 1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--border);font-size:13.5px;}
+.cap-res .pos{font-family:'Oswald',sans-serif;color:var(--muted);}
+.cap-res .pts{font-family:'Oswald',sans-serif;font-weight:600;font-size:17px;color:var(--navy);}
+.cap-res .track{grid-column:2/4;height:6px;border-radius:99px;background:var(--bg);overflow:hidden;}
+.cap-res .track>i{display:block;height:100%;background:var(--navy);}
+.cap-res.lead .track>i{background:var(--red);}
+.cap-res.lead .pts{color:var(--red);}
+.cap-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.cap-actions .btn-small,.cap-actions .btn-secondary{padding:11px 8px;font-size:12.5px;text-align:center;}
+.cap-estado{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;vertical-align:middle;margin-left:6px;}
+.cap-estado.abierta{background:#E7ECFA;color:var(--navy);}
+.cap-estado.cerrada{background:#FBEAEA;color:var(--red-dark);}
+.vote-page{display:none;min-height:100vh;background:var(--bg);padding-bottom:40px;}
+.vote-top{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;padding:16px 18px;padding-top:calc(16px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:12px;}
+.vote-body{max-width:520px;margin:0 auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));}
+.vt-lead{text-align:center;color:var(--muted);font-size:13.5px;margin:4px 0 14px;line-height:1.4;}
+.vt-legend{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px;}
+.vt-player{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;background:#fff;border:2px solid transparent;border-radius:12px;margin-bottom:8px;font-size:15.5px;cursor:pointer;text-align:left;color:var(--text);box-shadow:0 1px 2px rgba(15,30,61,.06);}
+.vt-player .vt-name{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:500;}
+.vt-player[aria-pressed="true"]{border-color:var(--red);}
+.vt-pick{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:1.5px dashed var(--border);display:grid;place-items:center;font-family:'Oswald',sans-serif;font-weight:700;color:#fff;}
+.vt-player[aria-pressed="true"] .vt-pick{background:var(--red);border:1.5px solid var(--red);}
+.vt-send{width:100%;padding:15px;border:none;border-radius:12px;background:var(--red);color:#fff;font-weight:700;font-size:16px;cursor:pointer;position:sticky;bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,.18);}
+.vt-send:disabled{background:#C9CDD6;box-shadow:none;cursor:not-allowed;}
+.vt-note{background:#fff;border-radius:14px;padding:26px 18px;text-align:center;box-shadow:0 1px 3px rgba(15,30,61,.07);}
+.vt-note h2{font-size:20px;color:var(--navy);text-transform:uppercase;margin-bottom:8px;}
+.vt-note p{margin:0;color:var(--muted);font-size:14px;line-height:1.45;}
+.vt-msg{text-align:center;font-weight:600;color:var(--red-dark);margin:10px 0;font-size:13.5px;}
+.vt-hint{text-align:center;color:var(--muted);font-size:12px;margin:10px 0 0;}
+
+/* ---- Sorteo de equipos ---- */
+.sor-stepper{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.sor-stepper .btn-secondary{width:44px;height:44px;padding:0;font-size:22px;line-height:1;}
+.sor-stepper .btn-secondary:disabled{opacity:.4;cursor:not-allowed;}
+.sor-stepper output{font-family:'Oswald',sans-serif;font-size:32px;font-weight:600;color:var(--navy);min-width:2ch;text-align:center;}
+.sor-pair{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px;}
+.sor-pair select{width:100%;min-width:0;padding:10px;border:1px solid var(--border);border-radius:9px;font-size:14px;background:#fff;color:var(--text);}
+.sor-pair .vs{font-size:12px;color:var(--muted);}
+.sor-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.sor-chip{display:flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:99px;padding:4px 4px 4px 12px;background:var(--bg);font-size:12.5px;}
+.sor-chip.off{opacity:.5;text-decoration:line-through;}
+.sor-chip button{border:none;background:none;color:var(--muted);font-size:17px;padding:0 7px;cursor:pointer;}
+.sor-msg{color:var(--red-dark);font-weight:600;font-size:13px;margin:8px 0 0;}
+.sor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:14px 0;}
+.sor-team{background:#fff;border-radius:14px;padding:14px;box-shadow:0 1px 3px rgba(15,30,61,.07);border-top:4px solid var(--tc);}
+.sor-team h4{margin:0 0 8px;display:flex;align-items:center;gap:10px;font-family:'Oswald',sans-serif;font-size:17px;text-transform:uppercase;letter-spacing:.04em;color:var(--navy);}
+.sor-badge{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;background:var(--tc);color:#fff;font-size:15px;}
+.sor-team h4 small{margin-left:auto;color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;text-transform:none;letter-spacing:0;font-weight:500;}
+.sor-team ul{margin:0;padding:0;list-style:none;}
+.sor-team li{padding:6px 0;border-top:1px solid var(--border);font-size:13.5px;overflow-wrap:anywhere;}
+.sor-team li:first-child{border-top:none;}
+.sor-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.sor-actions .btn-small,.sor-actions .btn-secondary{padding:12px 6px;font-size:12.5px;text-align:center;}
+
 @media (min-width:700px){
   .bottom-nav{max-width:720px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 }
@@ -276,6 +379,12 @@ canvas{max-width:100%;}
             <tbody id="statsTableBody"></tbody>
           </table>
         </div>
+      </div>
+
+      <div class="card" id="fichasCard" style="display:none">
+        <h3>Fichas de jugadores</h3>
+        <p class="hint">Toca un jugador para ver todos sus datos en una página aparte.</p>
+        <div class="fichas-grid" id="fichasGrid"></div>
       </div>
 
       <div class="card" id="chartsCard" style="display:none">
@@ -359,6 +468,7 @@ canvas{max-width:100%;}
     <!-- TAB JUGADORES -->
     <section id="tab-jugadores" class="tab-panel">
       <div class="section-header"><h2>Jugadores</h2><button class="btn-primary" onclick="abrirModalJugador()">+ Añadir</button></div>
+      <div class="card" id="capitanesCard"></div>
       <div id="jugadoresList" class="list-simple"></div>
     </section>
 
@@ -390,6 +500,12 @@ canvas{max-width:100%;}
             <tbody id="testFisicoBody_cooper"></tbody>
           </table>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>Sorteo de equipos</h3>
+        <p class="hint">Marca quién ha venido al entrenamiento, elige cuántos equipos quieres y sortea. Puedes indicar parejas que no deben coincidir.</p>
+        <button class="btn-primary" style="width:100%" onclick="abrirSorteo()">Abrir sorteo</button>
       </div>
 
       <div class="card">
@@ -486,6 +602,23 @@ canvas{max-width:100%;}
   </nav>
 </div>
 
+<div id="votePage" class="vote-page"></div>
+<div id="sorteoPage" class="ficha-page hidden">
+  <div class="ficha-top">
+    <button type="button" class="ficha-back" onclick="cerrarSorteo()">← Volver</button>
+    <strong>Sorteo de equipos</strong>
+    <div class="crest" style="margin-left:auto"><img src="logo-header.png" alt=""></div>
+  </div>
+  <div class="ficha-body" id="sorteoBody"></div>
+</div>
+<div id="fichaPage" class="ficha-page hidden">
+  <div class="ficha-top">
+    <button type="button" class="ficha-back" onclick="cerrarFicha()">← Volver</button>
+    <strong id="fichaTitulo">Ficha</strong>
+    <div class="crest" style="margin-left:auto"><img src="logo-header.png" alt=""></div>
+  </div>
+  <div class="ficha-body" id="fichaBody"></div>
+</div>
 <div id="modalOverlay" class="modal-overlay hidden">
   <div class="modal" id="modalContent"></div>
 </div>
@@ -493,7 +626,7 @@ canvas{max-width:100%;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '05/11/2026 - 18:44';
+const APP_VERSION = '12/11/2026 - 14:20';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -637,7 +770,7 @@ const FORMACIONES_POSICIONES = {
 };
 
 let state = { jugadores:[], entrenadores:[], config:{...CONFIG_DEFAULT}, partidos:[], multas:[], catalogo:[], ejercicios:[], tests:[], ingresos:[], balonParado:[] };
-let charts = { minutos:null, estados:null, evolucion:null };
+let charts = { minutos:null, estados:null, evolucion:null, ficha:null };
 let currentSort = { key:'minutos', dir:'desc' };
 let minutosView = 'calendario';
 let calFecha = new Date();
@@ -735,6 +868,8 @@ function migrarConvocatoria(partidos){
         const conv = e.estado === 'titular' || e.estado === 'suplente';
         p.convocatoria[jid] = { convocado: conv, condicion: conv ? e.estado : null, minutos: e.minutos || 0 };
       }
+      const e2 = p.convocatoria[jid];
+      if(e2 && e2.convocado && e2.manual === undefined && Number(e2.minutos) > 0) e2.manual = true;
     });
   });
   return partidos;
@@ -833,6 +968,7 @@ async function init(){
 
   renderAll();
   if(fbDb) activarSincronizacionEnVivo();
+  iniciarEscuchaCapitanes();
 }
 
 function aplicarDatosRemotos(remoto){
@@ -950,6 +1086,7 @@ function renderAll(){
   renderEntrenadoresTab();
   renderAjustesTab();
   renderEntrenamientosTab();
+  renderCapitanesCard();
 }
 
 /* ===================== UTILIDADES ===================== */
@@ -1301,6 +1438,8 @@ function renderMinutosTab(){
     renderCharts();
   }
   if(minutosView==='calendario') renderCalendario();
+  renderFichasGrid();
+  if(window.__fichaId && fichaAbierta()) renderFicha();
 }
 
 function abrirModalPartido(id){
@@ -1356,6 +1495,7 @@ async function guardarPartido(id){
   if(id){
     const p = state.partidos.find(x => x.id === id);
     Object.assign(p, {rival, fecha, hora, duracion, jornada, local, competicion, formacion, resultado});
+    aplicarMinutosAutomaticos(p);
     partidoFinal = p;
   } else {
     partidoFinal = {id:uid(), rival, fecha, hora, duracion, jornada, local, competicion, formacion, resultado, imagenConvocatoria:null, convocatoria:{}};
@@ -1379,12 +1519,65 @@ async function borrarPartido(id){
   showToast('Partido eliminado.');
 }
 
+/* ===================== RESULTADO + CAMBIOS + MINUTOS AUTOMÁTICOS ===================== */
+function partidoJugado(p){
+  return !!(p && (p.resultado || p.jugado === true || (p.sustituciones||[]).length > 0));
+}
+function idsConvocados(p){
+  const conv = p.convocatoria || {};
+  return Object.keys(conv).filter(id => conv[id] && conv[id].convocado);
+}
+/* Quién está en el campo en un minuto dado: titulares + cambios hechos hasta ese minuto */
+function enCampoEn(p, subs, minuto){
+  const conv = p.convocatoria || {};
+  const set = new Set(idsConvocados(p).filter(id => conv[id].condicion === 'titular'));
+  [...subs].sort((a,b) => a.minuto - b.minuto).forEach(c => {
+    if(c.minuto <= minuto){ set.delete(c.sale); set.add(c.entra); }
+  });
+  return set;
+}
+/* Devuelve {jugadorId: minutos} o null si no hay titulares marcados (no se puede calcular) */
+function calcularMinutosAuto(p, subs){
+  const D = Number(p.duracion) || 0;
+  const conv = p.convocatoria || {};
+  const ids = idsConvocados(p);
+  const titulares = ids.filter(id => conv[id].condicion === 'titular');
+  if(!titulares.length) return null;
+  const res = {}; ids.forEach(id => { res[id] = 0; });
+  const inicio = {}; titulares.forEach(id => { inicio[id] = 0; });
+  [...(subs||[])].sort((a,b) => a.minuto - b.minuto).forEach(c => {
+    const m = Math.min(Math.max(Number(c.minuto) || 0, 0), D);
+    if(inicio[c.sale] !== undefined){ res[c.sale] += (m - inicio[c.sale]); delete inicio[c.sale]; }
+    if((c.entra in res) && inicio[c.entra] === undefined) inicio[c.entra] = m;
+  });
+  Object.keys(inicio).forEach(id => { res[id] += (D - inicio[id]); });
+  return res;
+}
+/* Pone los minutos calculados a todos los convocados que NO estén en manual */
+function aplicarMinutosAutomaticos(p){
+  if(!partidoJugado(p)) return false;
+  const auto = calcularMinutosAuto(p, p.sustituciones || []);
+  if(!auto) return false;
+  Object.keys(p.convocatoria || {}).forEach(jid => {
+    const e = p.convocatoria[jid];
+    if(!e || !e.convocado || e.manual) return;
+    e.minutos = auto[jid] || 0;
+  });
+  return true;
+}
+function partidoRes(){ return state.partidos.find(x => x.id === window.__res.id); }
+
 function abrirModalResultado(id){
   const p = state.partidos.find(x => x.id === id);
   if(!p) return;
   const m = (p.resultado || '').match(/^\s*(\d+)\s*[-–:]\s*(\d+)\s*$/);
   const favor = m ? m[1] : '', contra = m ? m[2] : '';
   const textoLibre = (p.resultado && !m) ? `<p class="hint">Resultado guardado antes: <strong>${escapeHtml(p.resultado)}</strong>. Si pones goles aquí, lo sustituirá.</p>` : '';
+  window.__res = { id, subs: (p.sustituciones || []).map(c => ({minuto:Number(c.minuto)||0, sale:c.sale, entra:c.entra})), manual:{} };
+  Object.keys(p.convocatoria || {}).forEach(jid => {
+    const e = p.convocatoria[jid];
+    if(e && e.convocado && e.manual) window.__res.manual[jid] = Number(e.minutos) || 0;
+  });
   openModal(`
     <h3>Resultado · ${escapeHtml(p.rival || 'Partido')}</h3>
     <p class="hint">Goles de cada equipo (el primer número es siempre el de C.D. San Pedro). Déjalo en blanco si todavía no se ha jugado.</p>
@@ -1393,22 +1586,148 @@ function abrirModalResultado(id){
       <label>C.D. San Pedro<input type="number" id="mResFavor" min="0" inputmode="numeric" value="${favor}"></label>
       <label>${escapeHtml(p.rival || 'Rival')}<input type="number" id="mResContra" min="0" inputmode="numeric" value="${contra}"></label>
     </div>
+
+    <h4 class="res-sub">Cambios del partido</h4>
+    <div id="resCambios"></div>
+
+    <h4 class="res-sub">Minutos de cada jugador</h4>
+    <div id="resMinutos"></div>
+
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="guardarResultado('${id}')">Guardar</button>
     </div>`);
+  renderResCambios();
+  renderResMinutos();
 }
+function renderResCambios(){
+  const p = partidoRes(), R = window.__res, el = document.getElementById('resCambios');
+  const hayTitulares = idsConvocados(p).some(id => p.convocatoria[id].condicion === 'titular');
+  if(!hayTitulares){
+    el.innerHTML = '<p class="hint">Para registrar cambios, primero marca quiénes son titulares (en Alineación o en Convocatoria).</p>';
+    return;
+  }
+  const nombre = id => { const j = state.jugadores.find(x => x.id === id); return j ? escapeHtml(formatName(j.nombre)) : '?'; };
+  const lista = R.subs.map((c,i) => ({c,i})).sort((a,b) => a.c.minuto - b.c.minuto).map(({c,i}) => `
+    <div class="cambio-row"><span>Min ${c.minuto}' · Sale <strong>${nombre(c.sale)}</strong> → Entra <strong>${nombre(c.entra)}</strong></span>
+    <button type="button" class="icon-btn danger" onclick="quitarCambioRes(${i})">🗑</button></div>`).join('');
+  el.innerHTML = `
+    ${lista || '<p class="hint">Todavía no hay cambios: los titulares jugarían todo el partido.</p>'}
+    <label>Minuto del cambio<input type="number" id="resCamMin" min="0" max="${Number(p.duracion)||0}" inputmode="numeric" placeholder="Ej: 55" oninput="actualizarSelectsCambio()"></label>
+    <div class="form-grid">
+      <label>Sale<select id="resCamSale"></select></label>
+      <label>Entra<select id="resCamEntra"></select></label>
+    </div>
+    <button type="button" class="btn-secondary" style="width:100%" onclick="agregarCambioRes()">+ Añadir cambio</button>`;
+  actualizarSelectsCambio();
+}
+/* Sale = los que están en el campo en ese minuto; Entra = los convocados que están fuera */
+function actualizarSelectsCambio(){
+  const saleEl = document.getElementById('resCamSale'), entraEl = document.getElementById('resCamEntra');
+  if(!saleEl || !entraEl) return;
+  const p = partidoRes(), R = window.__res;
+  const v = document.getElementById('resCamMin').value.trim();
+  const m = (v === '' || isNaN(parseInt(v,10))) ? Infinity : parseInt(v,10);
+  const en = enCampoEn(p, R.subs, m);
+  const ids = idsConvocados(p);
+  const conv = state.jugadores.filter(j => ids.includes(j.id)).sort(comparaPosicion);
+  const opt = j => `<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`;
+  saleEl.innerHTML = conv.filter(j => en.has(j.id)).map(opt).join('') || '<option value="">—</option>';
+  entraEl.innerHTML = conv.filter(j => !en.has(j.id)).map(opt).join('') || '<option value="">—</option>';
+}
+function agregarCambioRes(){
+  const p = partidoRes(), R = window.__res;
+  const D = Number(p.duracion) || 0;
+  const minuto = parseInt(document.getElementById('resCamMin').value, 10);
+  const sale = document.getElementById('resCamSale').value;
+  const entra = document.getElementById('resCamEntra').value;
+  if(isNaN(minuto) || minuto < 0 || minuto > D){ showToast(`El minuto tiene que estar entre 0 y ${D}.`); return; }
+  if(!sale || !entra || sale === entra){ showToast('Elige quién sale y quién entra.'); return; }
+  const en = enCampoEn(p, R.subs, minuto);
+  if(!en.has(sale)){ showToast('Ese jugador no está en el campo en ese minuto.'); return; }
+  if(en.has(entra)){ showToast('Ese jugador ya está en el campo en ese minuto.'); return; }
+  R.subs.push({minuto, sale, entra});
+  renderResCambios();
+  renderResMinutos();
+}
+function quitarCambioRes(i){
+  window.__res.subs.splice(i, 1);
+  renderResCambios();
+  renderResMinutos();
+}
+function renderResMinutos(){
+  const p = partidoRes(), R = window.__res, el = document.getElementById('resMinutos');
+  const D = Number(p.duracion) || 0;
+  const ids = idsConvocados(p);
+  if(!ids.length){ el.innerHTML = '<p class="hint">No hay jugadores convocados. Marca primero la convocatoria.</p>'; return; }
+  const auto = calcularMinutosAuto(p, R.subs);
+  const jugadores = state.jugadores.filter(j => ids.includes(j.id)).sort(comparaPosicion);
+  const rows = jugadores.map(j => {
+    const e = p.convocatoria[j.id];
+    const man = R.manual[j.id] !== undefined;
+    const val = man ? R.manual[j.id] : (auto ? (auto[j.id] || 0) : (Number(e.minutos) || 0));
+    const cond = e.condicion === 'titular' ? '<span class="badge tit">Tit</span>' : (e.condicion === 'suplente' ? '<span class="badge sup">Sup</span>' : '<span class="badge sd">?</span>');
+    return `
+    <div class="res-min-row ${man ? 'manual' : ''}" data-jid="${j.id}">
+      ${avatarHtml(j,'small')}
+      <span class="conv-name">${escapeHtml(formatName(j.nombre))}</span>
+      ${cond}
+      <input type="number" class="min-input" min="0" max="${D}" inputmode="numeric" value="${val}" oninput="editarMinutoRes('${j.id}', this)">
+      <button type="button" class="icon-btn res-reset" title="Volver al cálculo automático" onclick="resetMinutoRes('${j.id}')">↺</button>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <p class="hint">${auto
+      ? 'Los minutos se calculan solos con los titulares y los cambios. Si escribes un número a mano, ese jugador pasa a <strong style="color:var(--red)">manual</strong> y no se recalcula; pulsa ↺ para devolverlo al automático.'
+      : 'No hay titulares marcados, así que no puedo calcular los minutos solo. Marca los titulares (Alineación o Convocatoria) o escribe los minutos a mano.'}</p>
+    <div>${rows}</div>
+    <div class="res-total" id="resTotal"></div>
+    <button type="button" class="btn-ghost" onclick="recalcularTodoRes()">↺ Recalcular todos en automático</button>`;
+  actualizarTotalRes();
+}
+function actualizarTotalRes(){
+  const p = partidoRes(); if(!p) return;
+  const D = Number(p.duracion) || 0;
+  const total = [...document.querySelectorAll('#resMinutos .res-min-row .min-input')].reduce((s,i) => s + (parseInt(i.value,10) || 0), 0);
+  const el = document.getElementById('resTotal');
+  if(el) el.textContent = `Total: ${total} min (con 11 en el campo serían ${11*D}).`;
+}
+function editarMinutoRes(jid, input){
+  const D = Number(partidoRes().duracion) || 0;
+  const row = input.closest('.res-min-row');
+  const v = input.value.trim();
+  if(v === ''){ delete window.__res.manual[jid]; row.classList.remove('manual'); }
+  else {
+    window.__res.manual[jid] = Math.max(0, Math.min(D, parseInt(v,10) || 0));
+    row.classList.add('manual');
+  }
+  actualizarTotalRes();
+}
+function resetMinutoRes(jid){ delete window.__res.manual[jid]; renderResMinutos(); }
+function recalcularTodoRes(){ window.__res.manual = {}; renderResMinutos(); }
+
 async function guardarResultado(id){
   const p = state.partidos.find(x => x.id === id);
   if(!p) return;
   const favor = document.getElementById('mResFavor').value.trim();
   const contra = document.getElementById('mResContra').value.trim();
   if((favor === '') !== (contra === '')){ showToast('Rellena los goles de los dos equipos.'); return; }
+  const R = window.__res;
   p.resultado = favor === '' ? '' : `${parseInt(favor,10)}-${parseInt(contra,10)}`;
+  p.sustituciones = R.subs.map(c => ({minuto:Number(c.minuto)||0, sale:c.sale, entra:c.entra}));
+  if(p.resultado || p.sustituciones.length) p.jugado = true;
+  const auto = calcularMinutosAuto(p, p.sustituciones);
+  Object.keys(p.convocatoria || {}).forEach(jid => {
+    const e = p.convocatoria[jid];
+    if(!e) return;
+    if(!e.convocado){ e.minutos = 0; e.manual = false; return; }
+    if(R.manual[jid] !== undefined){ e.minutos = R.manual[jid]; e.manual = true; }
+    else { e.manual = false; if(auto && partidoJugado(p)) e.minutos = auto[jid] || 0; }
+  });
   await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: p});
   closeModal();
   renderMinutosTab();
-  showToast(p.resultado ? 'Resultado guardado.' : 'Resultado borrado.');
+  showToast(p.resultado || p.sustituciones.length ? 'Resultado y minutos guardados.' : 'Guardado.');
 }
 
 function abrirModalConvocatoria(partidoId){
@@ -1432,7 +1751,6 @@ function abrirModalConvocatoria(partidoId){
           <button type="button" class="seg-btn ${e.condicion==='suplente'?'active':''}" data-val="suplente">Suplente</button>
           <button type="button" class="seg-btn ${!e.condicion?'active':''}" data-val="">Sin decidir</button>
         </div>
-        <input type="number" class="min-input" value="${e.minutos||0}" min="0" max="${partido.duracion}">
       </div>
     </div>`;
   }).join('');
@@ -1440,7 +1758,7 @@ function abrirModalConvocatoria(partidoId){
   convocatoriaImagenPendiente = undefined;
   openModal(`
     <h3>${escapeHtml(partido.rival||'Partido')} · ${formatDateShort(partido.fecha)}</h3>
-    <p class="hint">Primero decide quién está <strong>convocado</strong> (esto es lo que sale en el PDF). Titular/suplente y minutos lo puedes rellenar cuando lo decidas o al terminar el partido.</p>
+    <p class="hint">Primero decide quién está <strong>convocado</strong> (esto es lo que sale en el PDF). Titular/suplente lo puedes rellenar cuando lo decidas. Los <strong>minutos</strong> ya no se ponen aquí: se calculan solos en el botón <strong>Resultado</strong> con los cambios del partido (y allí también puedes escribirlos a mano).</p>
     <label>Imagen adicional para el PDF (opcional, el escudo siempre sale fijo)
       <input type="file" accept="image/*" id="mConvImagen" onchange="previewImagenConvocatoria(event)">
     </label>
@@ -1474,7 +1792,6 @@ function toggleConvocadoRow(chk){
   if(!chk.checked){
     row.querySelectorAll('.seg-cond .seg-btn').forEach(b => b.classList.remove('active'));
     row.querySelector('.seg-cond .seg-btn[data-val=""]').classList.add('active');
-    row.querySelector('.min-input').value = 0;
   }
 }
 function marcarTodosConvocatoria(convocado){
@@ -1506,10 +1823,13 @@ async function guardarConvocatoria(partidoId){
       const condActive = row.querySelector('.seg-cond .seg-btn.active');
       condicion = (condActive && condActive.dataset.val) ? condActive.dataset.val : null;
     }
-    const minutos = convocado ? (parseInt(row.querySelector('.min-input').value,10) || 0) : 0;
-    partido.convocatoria[jid] = {convocado, condicion, minutos};
+    const old = partido.convocatoria[jid] || {};
+    partido.convocatoria[jid] = convocado
+      ? {convocado:true, condicion, minutos:Number(old.minutos)||0, manual:!!old.manual}
+      : {convocado:false, condicion:null, minutos:0, manual:false};
   });
   if(convocatoriaImagenPendiente !== undefined) partido.imagenConvocatoria = convocatoriaImagenPendiente;
+  aplicarMinutosAutomaticos(partido);
   await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: partido});
   closeModal();
   renderMinutosTab();
@@ -1559,7 +1879,7 @@ function renderStatsTable(){
   document.getElementById('statsTableBody').innerHTML = rows.map(r => `
     <tr>
       <td><span class="dorsal-badge small">${r.jugador.dorsal}</span></td>
-      <td>${escapeHtml(formatName(r.jugador.nombre))}</td>
+      <td><button type="button" class="name-link" onclick="abrirFichaJugador('${r.jugador.id}')">${escapeHtml(formatName(r.jugador.nombre))}</button></td>
       <td>${r.partidosConvocado}</td>
       <td>${r.titular}</td>
       <td>${r.suplente}</td>
@@ -1674,6 +1994,7 @@ function sincronizarCondicionConAlineacion(partido){
     if(enOnce.has(jid)) e.condicion = 'titular';
     else e.condicion = enOnce.size > 0 ? 'suplente' : null;
   });
+  aplicarMinutosAutomaticos(partido);
 }
 async function cambiarFormacionAlineacion(){
   const partido = state.partidos.find(p => p.id === window.__alinPartidoId);
@@ -1718,6 +2039,608 @@ async function asignarPosicion(slotId, jugadorId){
   await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: partido});
   renderMinutosTab();
   abrirModalAlineacion(window.__alinPartidoId);
+}
+
+/* ===================== FICHA DE JUGADOR (página aparte) ===================== */
+function renderFichasGrid(){
+  const card = document.getElementById('fichasCard');
+  if(!state.jugadores.length){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const stats = {}; computeStats().forEach(s => { stats[s.jugador.id] = s; });
+  document.getElementById('fichasGrid').innerHTML = [...state.jugadores].sort(comparaPosicion).map(j => `
+    <button type="button" class="ficha-chip" onclick="abrirFichaJugador('${j.id}')">
+      ${avatarHtml(j,'small')}
+      <span class="fc-text"><span class="fc-name">${escapeHtml(formatName(j.nombre))}</span><span class="fc-sub">${stats[j.id] ? stats[j.id].minutos : 0} min${j.posicion ? ' · ' + escapeHtml(j.posicion) : ''}</span></span>
+    </button>`).join('');
+}
+function fichaAbierta(){ return !document.getElementById('fichaPage').classList.contains('hidden'); }
+function abrirFichaJugador(id){
+  if(!state.jugadores.find(x => x.id === id)) return;
+  window.__fichaId = id;
+  closeModal();
+  renderFicha();
+  const pg = document.getElementById('fichaPage');
+  pg.classList.remove('hidden');
+  pg.scrollTop = 0;
+  document.body.classList.add('ficha-open');
+  if(location.hash !== '#ficha') location.hash = 'ficha';
+}
+function cerrarFicha(){
+  if(location.hash === '#ficha') history.back(); else ocultarFicha();
+}
+function ocultarFicha(){
+  document.getElementById('fichaPage').classList.add('hidden');
+  document.body.classList.remove('ficha-open');
+  if(charts.ficha){ charts.ficha.destroy(); charts.ficha = null; }
+}
+window.addEventListener('hashchange', () => {
+  if(location.hash !== '#ficha' && fichaAbierta()) ocultarFicha();
+  if(location.hash !== '#sorteo' && sorteoAbierto()) ocultarSorteo();
+});
+
+function renderFicha(){
+  const j = state.jugadores.find(x => x.id === window.__fichaId);
+  if(!j){ ocultarFicha(); return; }
+  const cuentan = partidosParaEstadisticas();
+  const st = computeStats().find(s => s.jugador.id === j.id) || {minutos:0, titular:0, suplente:0, noConvocado:0, partidosConvocado:0, media:0};
+  const totalPosibles = cuentan.reduce((s,p) => s + (Number(p.duracion)||0), 0) || 1;
+  const pct = (st.minutos / totalPosibles) * 100;
+  const completos = cuentan.filter(p => { const e = (p.convocatoria||{})[j.id]; return e && e.convocado && (Number(e.minutos)||0) >= (Number(p.duracion)||0) && (Number(p.duracion)||0) > 0; }).length;
+
+  const todos = [...state.partidos].sort((a,b) => new Date(a.fecha) - new Date(b.fecha)).map(p => {
+    const e = (p.convocatoria||{})[j.id];
+    const conv = !!(e && e.convocado);
+    let entra = null, sale = null;
+    (p.sustituciones||[]).forEach(c => { if(c.entra === j.id) entra = c.minuto; if(c.sale === j.id) sale = c.minuto; });
+    return {p, e, conv, min: conv ? (Number(e.minutos)||0) : 0, cond: conv ? e.condicion : null, entra, sale, cuenta: p.competicion !== 'Amistoso'};
+  });
+
+  const badge = r => !r.conv ? '<span class="badge nc">No conv.</span>' : (r.cond === 'titular' ? '<span class="badge tit">Titular</span>' : (r.cond === 'suplente' ? '<span class="badge sup">Suplente</span>' : '<span class="badge sd">Sin decidir</span>'));
+  const detalle = r => {
+    const partes = [];
+    if(r.conv && r.cond === 'suplente' && r.entra != null) partes.push(`Entra min ${r.entra}'`);
+    if(r.conv && r.sale != null) partes.push(`Sale min ${r.sale}'`);
+    if(r.p.resultado) partes.push(r.p.resultado);
+    if(!r.cuenta) partes.push('Amistoso');
+    return partes.join(' · ');
+  };
+  const partidosHtml = todos.length ? [...todos].reverse().map(r => `
+    <div class="pj-row">
+      <span class="pj-date">${formatDateShort(r.p.fecha)}</span>
+      <div class="pj-main"><strong>${r.p.jornada ? 'J' + r.p.jornada + ' · ' : ''}${escapeHtml(r.p.rival || 'Partido')}</strong><small>${escapeHtml(detalle(r))}</small></div>
+      ${badge(r)}
+      <span class="pj-min">${r.conv ? r.min + "'" : '–'}</span>
+    </div>`).join('') : '<p class="hint">Todavía no hay partidos.</p>';
+
+  let multasHtml = '';
+  if(!j.filial){
+    const ms = state.multas.filter(m => m.jugadorId === j.id).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+    const tot = ms.reduce((s,m) => s + importeActual(m), 0);
+    const pag = ms.filter(m => m.pagada).reduce((s,m) => s + importeActual(m), 0);
+    multasHtml = `
+    <div class="card">
+      <h3>Multas</h3>
+      <div class="ficha-tiles">
+        <div class="tile"><b>${money(tot)}</b><span>Total</span></div>
+        <div class="tile"><b>${money(pag)}</b><span>Pagado</span></div>
+        <div class="tile ${tot - pag > 0 ? 'accent' : ''}"><b>${money(tot - pag)}</b><span>Pendiente</span></div>
+      </div>
+      ${ms.length ? `<div style="margin-top:10px">${ms.map(m => `
+        <div class="pj-row"><span class="pj-date">${formatDateShort(m.fecha)}</span><div class="pj-main"><strong>${escapeHtml(m.motivo)}</strong></div><span class="badge ${m.pagada ? 'tit' : 'sd'}">${m.pagada ? 'Pagada' : 'Pendiente'}</span><span class="pj-min" style="font-size:15px">${money(importeActual(m))}</span></div>`).join('')}</div>` : '<p class="hint" style="margin:10px 0 0">Sin multas. 👏</p>'}
+    </div>`;
+  }
+
+  let testsHtml = '';
+  if(!j.filial){
+    const bloques = Object.keys(TIPOS_TEST).map(tipo => {
+      const ts = state.tests.filter(t => (t.tipo || 'course_navette') === tipo).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+      const filas = ts.map(t => ({t, v: (t.resultados||{})[j.id]})).filter(x => x.v && (typeof x.v === 'string' ? x.v.trim() : (x.v.t20 || x.v.t40 || x.v.t60)));
+      if(!filas.length) return '';
+      return `<div class="res-sub" style="margin-top:12px">${TIPOS_TEST[tipo].nombre}</div>` + filas.map(x => `<div class="pj-row"><span class="pj-date" style="width:auto">${formatDateLong(x.t.fecha)}</span><div class="pj-main" style="text-align:right"><strong>${formatearResultadoTest(tipo, x.v)}</strong></div></div>`).join('');
+    }).join('');
+    testsHtml = `<div class="card"><h3>Tests físicos</h3>${bloques || '<p class="hint" style="margin:0">Todavía no hay resultados de tests para este jugador.</p>'}</div>`;
+  }
+
+  document.getElementById('fichaBody').innerHTML = `
+    <div class="card">
+      <div class="ficha-hero">
+        ${avatarHtml(j,'xl')}
+        <div>
+          <h2>${escapeHtml(formatName(j.nombre))}</h2>
+          <span class="muted">Dorsal ${j.dorsal}${j.posicion ? ' · ' + escapeHtml(j.posicion) : ''}${j.filial ? ' · Filial Cadete B' : ''}</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Resumen de la temporada</h3>
+      <div class="ficha-tiles">
+        <div class="tile accent"><b>${st.minutos}</b><span>Minutos</span></div>
+        <div class="tile"><b>${st.partidosConvocado}</b><span>Convocado</span></div>
+        <div class="tile"><b>${st.media.toFixed(0)}</b><span>Media / partido</span></div>
+        <div class="tile"><b>${st.titular}</b><span>Titular</span></div>
+        <div class="tile"><b>${st.suplente}</b><span>Suplente</span></div>
+        <div class="tile"><b>${st.noConvocado}</b><span>No convocado</span></div>
+        <div class="tile"><b>${pct.toFixed(0)}%</b><span>% de minutos</span></div>
+        <div class="tile"><b>${completos}</b><span>Completos</span></div>
+        <div class="tile"><b>${cuentan.length}</b><span>Partidos liga/copa</span></div>
+      </div>
+      <p class="hint" style="margin:10px 0 0">Los amistosos no cuentan en estas cifras.</p>
+    </div>
+    <div class="card">
+      <h3>Minutos por partido</h3>
+      <canvas id="chartFicha" height="200"></canvas>
+    </div>
+    <div class="card">
+      <h3>Partido a partido</h3>
+      ${partidosHtml}
+    </div>
+    ${multasHtml}
+    ${testsHtml}`;
+  document.getElementById('fichaTitulo').textContent = formatName(j.nombre);
+
+  if(charts.ficha) charts.ficha.destroy();
+  const contables = todos.filter(r => r.cuenta);
+  charts.ficha = new Chart(document.getElementById('chartFicha'), {
+    type:'bar',
+    data:{
+      labels: contables.map(r => `${formatDateShort(r.p.fecha)} ${r.p.rival ? 'vs ' + r.p.rival : ''}`),
+      datasets:[{label:'Minutos', data: contables.map(r => r.min), borderRadius:4,
+        backgroundColor: contables.map(r => !r.conv ? '#C9CDD6' : (r.cond === 'titular' ? '#0F1E3D' : '#D22630'))}]
+    },
+    options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{font:{size:9}, autoSkip:false, maxRotation:60, minRotation:45}}, y:{beginAtZero:true}}}
+  });
+}
+
+/* ===================== VOTACIÓN DE CAPITANES ===================== */
+const VOTE_PTS = [5, 3, 2, 1];
+let capActual = null, capVotos = [], capVotosRef = null, capVotosId = null, capListo = false;
+
+/* --- Lado entrenador: pestaña Jugadores --- */
+function iniciarEscuchaCapitanes(){
+  if(!fbDb) return;
+  fbDb.ref('capitanes/actual').on('value', snap => {
+    capActual = snap.val(); capListo = true;
+    const id = capActual ? capActual.id : null;
+    if(id !== capVotosId){
+      if(capVotosRef){ capVotosRef.off(); capVotosRef = null; }
+      capVotos = []; capVotosId = id;
+      if(id){
+        capVotosRef = fbDb.ref('capitanes/votos/' + id);
+        capVotosRef.on('value', s => { capVotos = Object.values(s.val() || {}); renderCapitanesCard(); });
+      }
+    }
+    renderCapitanesCard();
+  }, () => { capListo = true; renderCapitanesCard(); });
+}
+function tallyCapitanes(){
+  const cand = normalizarArray(capActual.candidatos);
+  const pts = {}; cand.forEach(c => { pts[c.id] = 0; });
+  let n = 0;
+  capVotos.forEach(b => {
+    const p = b && b.picks;
+    const arr = Array.isArray(p) ? p : Object.values(p || {});
+    if(arr.length !== 4) return;
+    const seen = {};
+    for(const id of arr){ if(!(id in pts) || seen[id]) return; seen[id] = 1; }
+    arr.forEach((id,i) => { pts[id] += VOTE_PTS[i]; });
+    n++;
+  });
+  const rows = cand.map(c => ({...c, pts: pts[c.id]})).sort((a,b) => b.pts - a.pts || a.dorsal - b.dorsal);
+  return {rows, n, total: cand.length};
+}
+function enlaceVotacion(){
+  return location.origin + location.pathname + '?votar=' + encodeURIComponent(capActual.id);
+}
+function renderCapitanesCard(){
+  const el = document.getElementById('capitanesCard');
+  if(!el) return;
+  if(!fbDb){
+    el.innerHTML = '<h3>Votación de capitanes</h3><p class="hint" style="margin:0">Hace falta conexión con la nube (Firebase) para votar. Revisa la conexión y recarga.</p>';
+    return;
+  }
+  if(!capListo){ el.innerHTML = '<h3>Votación de capitanes</h3><p class="hint" style="margin:0">Cargando…</p>'; return; }
+  if(!capActual){
+    el.innerHTML = `
+      <h3>Votación de capitanes</h3>
+      <p class="hint">Crea una votación con tus jugadores y comparte el enlace por WhatsApp. Cada jugador elige 4 candidatos (5, 3, 2 y 1 puntos) y el voto es anónimo. Los resultados solo los ves tú aquí.</p>
+      <button class="btn-primary" style="width:100%" onclick="abrirModalCrearVotacion()">+ Crear votación</button>`;
+    return;
+  }
+  const t = tallyCapitanes();
+  const abierta = capActual.abierta !== false;
+  const pct = t.total ? Math.min(100, Math.round(t.n / t.total * 100)) : 0;
+  const max = (t.rows[0] && t.rows[0].pts) || 1;
+  el.innerHTML = `
+    <h3>Votación de capitanes <span class="cap-estado ${abierta ? 'abierta' : 'cerrada'}">${abierta ? 'Abierta' : 'Cerrada'}</span></h3>
+    <div class="cap-count"><span>Votos recibidos</span><b>${t.n} / ${t.total}</b></div>
+    <div class="cap-bar"><i style="width:${pct}%"></i></div>
+    ${t.n === 0 ? '<p class="hint" style="margin:0 0 4px">Todavía no ha votado nadie.</p>' : t.rows.map((r,i) => `
+      <div class="cap-res ${i === 0 && r.pts > 0 ? 'lead' : ''}">
+        <span class="pos">${i + 1}</span>
+        <span>${r.dorsal ? r.dorsal + ' · ' : ''}${escapeHtml(r.nombre)}</span>
+        <span class="pts">${r.pts}</span>
+        <div class="track"><i style="width:${Math.round(r.pts / max * 100)}%"></i></div>
+      </div>`).join('')}
+    <div class="cap-actions">
+      <button class="btn-small" onclick="compartirVotacion()">📲 Compartir enlace</button>
+      <button class="btn-secondary" onclick="copiarEnlaceVotacion()">Copiar enlace</button>
+      <button class="btn-secondary" onclick="alternarVotacion()">${abierta ? 'Cerrar votación' : 'Reabrir votación'}</button>
+      <button class="btn-secondary" onclick="borrarVotacion()">Borrar y empezar otra</button>
+    </div>`;
+}
+function abrirModalCrearVotacion(){
+  if(!fbDb){ showToast('Hace falta conexión con la nube.'); return; }
+  const js = [...state.jugadores].sort((a,b) => (Number(a.dorsal)||0) - (Number(b.dorsal)||0));
+  if(js.length < 4){ showToast('Necesitas al menos 4 jugadores.'); return; }
+  openModal(`
+    <h3>Nueva votación de capitanes</h3>
+    <p class="hint">Marca los jugadores que pueden ser elegidos. Salen por orden de dorsal. Los de filial vienen desmarcados.</p>
+    <div class="convocatoria-list">${js.map(j => `
+      <div class="convocatoria-row"><div class="conv-row-top">
+        ${avatarHtml(j,'small')}
+        <span class="conv-name">${escapeHtml(formatName(j.nombre))}</span>
+        <label class="switch"><input type="checkbox" class="cap-cand" data-jid="${j.id}" ${j.filial ? '' : 'checked'}><span class="slider"></span></label>
+      </div></div>`).join('')}
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="crearVotacion()">Crear votación</button>
+    </div>`);
+}
+async function crearVotacion(){
+  const ids = [...document.querySelectorAll('.cap-cand')].filter(c => c.checked).map(c => c.dataset.jid);
+  if(ids.length < 4){ showToast('Marca al menos 4 candidatos.'); return; }
+  const candidatos = state.jugadores.filter(j => ids.includes(j.id))
+    .sort((a,b) => (Number(a.dorsal)||0) - (Number(b.dorsal)||0))
+    .map(j => ({id:j.id, nombre:formatName(j.nombre), dorsal:Number(j.dorsal)||0}));
+  try{
+    await fbDb.ref('capitanes').set({actual:{id:uid(), abierta:true, creada:Date.now(), candidatos}});
+    closeModal();
+    showToast('Votación creada. Ya puedes compartir el enlace.');
+  }catch(e){ showToast('No se pudo crear la votación. Revisa la conexión.'); }
+}
+async function compartirVotacion(){
+  const url = enlaceVotacion();
+  if(navigator.share){
+    try{ await navigator.share({title:'Votación de capitanes · Cadete A', text:'Votación de capitanes: elige a tus 4 candidatos (5, 3, 2 y 1 puntos). Es anónimo.', url}); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  copiarEnlaceVotacion();
+}
+async function copiarEnlaceVotacion(){
+  const url = enlaceVotacion();
+  try{ await navigator.clipboard.writeText(url); showToast('Enlace copiado.'); }
+  catch(e){ prompt('Copia este enlace:', url); }
+}
+async function alternarVotacion(){
+  const abierta = capActual.abierta !== false;
+  try{ await fbDb.ref('capitanes/actual/abierta').set(!abierta); showToast(abierta ? 'Votación cerrada.' : 'Votación reabierta.'); }
+  catch(e){ showToast('No se pudo cambiar. Revisa la conexión.'); }
+}
+async function borrarVotacion(){
+  if(!confirm('Se borrarán todos los votos y el enlace actual dejará de funcionar. ¿Seguro?')) return;
+  try{ await fbDb.ref('capitanes').remove(); showToast('Votación borrada.'); }
+  catch(e){ showToast('No se pudo borrar. Revisa la conexión.'); }
+}
+
+/* --- Lado jugador: página que se abre con ?votar=ID (solo muestra la votación) --- */
+function tokenVotante(){
+  try{
+    let t = localStorage.getItem('cdsp_voter_token');
+    if(!t){ t = uid() + uid(); localStorage.setItem('cdsp_voter_token', t); }
+    return t;
+  }catch(e){ return window.__tokenMem || (window.__tokenMem = uid() + uid()); }
+}
+function votoYaEnviadoLocal(vid){ try{ return localStorage.getItem('cdsp_votado_' + vid) === '1'; }catch(e){ return false; } }
+function conTimeout(promesa, ms){ return Promise.race([promesa, new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms))]); }
+
+async function iniciarModoVotacion(){
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('splashScreen').classList.add('hide');
+  document.getElementById('votePage').style.display = 'block';
+  document.title = 'Votación de capitanes · Cadete A';
+  const vid = new URLSearchParams(location.search).get('votar') || '';
+  const V = window.__V = {vid, picks:[], act:null, estado:'cargando', busy:false, msg:''};
+  renderVoto();
+  if(!fbDb){ V.estado = 'error'; renderVoto(); return; }
+  try{
+    const snap = await conTimeout(fbDb.ref('capitanes/actual').once('value'), 12000);
+    V.act = snap.val();
+    if(!V.act || V.act.id !== vid) V.estado = 'inactiva';
+    else if(V.act.abierta === false) V.estado = 'cerrada';
+    else if(votoYaEnviadoLocal(vid)) V.estado = 'votado';
+    else {
+      const mio = await conTimeout(fbDb.ref('capitanes/votantes/' + vid + '/' + tokenVotante()).once('value'), 12000);
+      V.estado = mio.exists() ? 'votado' : 'votar';
+    }
+  }catch(e){ V.estado = 'error'; }
+  renderVoto();
+}
+function toggleVoto(id){
+  const V = window.__V; if(V.busy) return;
+  const i = V.picks.indexOf(id);
+  if(i >= 0) V.picks.splice(i,1); else if(V.picks.length < 4) V.picks.push(id);
+  V.msg = ''; renderVoto();
+}
+function renderVoto(){
+  const V = window.__V, pg = document.getElementById('votePage');
+  const top = `<div class="vote-top"><div class="crest"><img src="logo-header.png" alt=""></div><div class="titles"><h1>Votación de capitanes</h1><span>Cadete A · C.D. San Pedro</span></div></div>`;
+  const nota = (titulo, texto) => `<div class="vt-note"><h2>${titulo}</h2><p>${texto}</p></div>`;
+  let cuerpo;
+  if(V.estado === 'cargando') cuerpo = nota('Cargando…', 'Un momento.');
+  else if(V.estado === 'error') cuerpo = nota('Sin conexión', 'No se ha podido cargar la votación. Revisa tu conexión y vuelve a abrir el enlace.');
+  else if(V.estado === 'inactiva') cuerpo = nota('Votación no disponible', 'Este enlace ya no está activo. Pide el enlace nuevo al entrenador.');
+  else if(V.estado === 'cerrada') cuerpo = nota('Votación cerrada', 'El entrenador ya ha cerrado la votación.');
+  else if(V.estado === 'votado') cuerpo = nota('¡Voto enviado!', 'Gracias. Tu voto es anónimo. Ya puedes cerrar esta página.');
+  else {
+    const cand = normalizarArray(V.act.candidatos).sort((a,b) => (a.dorsal||0) - (b.dorsal||0));
+    cuerpo = `
+      <p class="vt-lead">Elige a tus <strong>4 candidatos</strong> a capitán por orden. El voto es anónimo y solo puedes votar una vez.</p>
+      <div class="vt-legend">${VOTE_PTS.map((p,i) => `<span>${i + 1}º = ${p} ${p === 1 ? 'punto' : 'puntos'}</span>`).join('')}</div>
+      ${cand.map(c => {
+        const at = V.picks.indexOf(c.id);
+        return `<button type="button" class="vt-player" aria-pressed="${at >= 0}" ${V.busy ? 'disabled' : ''} data-id="${escapeHtml(c.id)}">
+          <span class="dorsal-badge">${c.dorsal || ''}</span><span class="vt-name">${escapeHtml(c.nombre)}</span><span class="vt-pick">${at >= 0 ? at + 1 : ''}</span></button>`;
+      }).join('')}
+      ${V.msg ? `<p class="vt-msg">${escapeHtml(V.msg)}</p>` : ''}
+      <button type="button" class="vt-send" id="vtSend" ${(V.picks.length === 4 && !V.busy) ? '' : 'disabled'}>${V.busy ? 'Enviando…' : 'Enviar voto'}</button>
+      <p class="vt-hint">Toca 4 jugadores en orden, del 1º al 4º. Vuelve a tocar uno para quitarlo.</p>`;
+  }
+  pg.innerHTML = top + `<div class="vote-body">${cuerpo}</div>`;
+  pg.querySelectorAll('.vt-player').forEach(b => b.addEventListener('click', () => toggleVoto(b.dataset.id)));
+  const send = document.getElementById('vtSend');
+  if(send) send.addEventListener('click', enviarVoto);
+}
+async function enviarVoto(){
+  const V = window.__V;
+  if(V.busy || V.picks.length !== 4) return;
+  V.busy = true; V.msg = ''; renderVoto();
+  const vRef = fbDb.ref('capitanes/votantes/' + V.vid + '/' + tokenVotante());
+  let reservado = false;
+  try{
+    const a = (await conTimeout(fbDb.ref('capitanes/actual').once('value'), 12000)).val();
+    if(!a || a.id !== V.vid){ V.estado = 'inactiva'; V.busy = false; renderVoto(); return; }
+    if(a.abierta === false){ V.estado = 'cerrada'; V.busy = false; renderVoto(); return; }
+    const res = await conTimeout(vRef.transaction(cur => cur ? undefined : true), 12000);
+    if(!res.committed){ V.estado = 'votado'; V.busy = false; renderVoto(); return; }
+    reservado = true;
+    await conTimeout(fbDb.ref('capitanes/votos/' + V.vid).push({picks: V.picks.slice()}), 12000);
+    try{ localStorage.setItem('cdsp_votado_' + V.vid, '1'); }catch(e){}
+    V.estado = 'votado';
+  }catch(e){
+    if(reservado){ try{ await vRef.remove(); }catch(_){} }
+    V.msg = 'No se pudo enviar el voto. Inténtalo de nuevo.';
+  }
+  V.busy = false; renderVoto();
+}
+
+/* ===================== SORTEO DE EQUIPOS (Entrenamientos) ===================== */
+const SORTEO_KEY = 'cdsp_sorteo_v1';
+const SORTEO_COLORES = ['#0F1E3D','#D22630','#3B5BA9','#A81B24','#5C6B8A','#E0646C','#17294D','#8A93A6'];
+let sorteo = {sel:{}, guests:[], k:2, rules:[]};
+let sorteoUltimo = null;
+
+function sorteoAbierto(){ return !document.getElementById('sorteoPage').classList.contains('hidden'); }
+function cargarSorteo(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SORTEO_KEY) || 'null');
+    if(s){
+      sorteo.sel = (s.sel && typeof s.sel === 'object') ? s.sel : {};
+      sorteo.guests = Array.isArray(s.guests) ? s.guests.filter(g => g && g.id && g.nombre) : [];
+      sorteo.k = Number(s.k) || 2;
+      sorteo.rules = Array.isArray(s.rules) ? s.rules.filter(r => Array.isArray(r) && r.length === 2) : [];
+    }
+  }catch(e){}
+  state.jugadores.forEach(j => { if(sorteo.sel[j.id] === undefined) sorteo.sel[j.id] = !j.filial; });
+}
+function guardarSorteo(){ try{ localStorage.setItem(SORTEO_KEY, JSON.stringify(sorteo)); }catch(e){} }
+function sorteoLista(){
+  const jug = [...state.jugadores].sort(comparaPosicion).map(j => ({id:j.id, nombre:formatName(j.nombre), jug:j}));
+  const inv = sorteo.guests.map(g => ({id:g.id, nombre:g.nombre, guest:true}));
+  return jug.concat(inv);
+}
+function sorteoParticipantes(){ return sorteoLista().filter(p => sorteo.sel[p.id]); }
+
+function abrirSorteo(){
+  cargarSorteo();
+  sorteoUltimo = null;
+  document.getElementById('sorteoBody').innerHTML = `
+    <div class="card">
+      <div class="section-header" style="margin-bottom:6px"><h3 style="margin:0">¿Quién ha venido?</h3><span class="muted" id="sorCount"></span></div>
+      <p class="hint">Marca los que participan en el sorteo. Los de filial vienen desmarcados.</p>
+      <div class="conv-toolbar">
+        <button type="button" class="btn-ghost" onclick="sorteoMarcar(true)">Marcar todos</button>
+        <button type="button" class="btn-ghost" onclick="sorteoMarcar(false)">Quitar todos</button>
+      </div>
+      <div class="convocatoria-list" id="sorLista" style="max-height:none"></div>
+      <div class="inline-form" style="margin-top:12px;flex-wrap:nowrap">
+        <input type="text" id="sorInvitado" placeholder="Añadir invitado (otro jugador)" style="flex:1;width:auto;min-width:0;padding:10px;font-size:14px" onkeydown="if(event.key==='Enter') sorteoAddInvitado()">
+        <button type="button" class="btn-secondary" onclick="sorteoAddInvitado()">+ Añadir</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Equipos</h3>
+      <div class="sor-stepper">
+        <button type="button" class="btn-secondary" id="sorMenos" onclick="sorteoK(-1)" aria-label="Un equipo menos">−</button>
+        <output id="sorK">2</output>
+        <button type="button" class="btn-secondary" id="sorMas" onclick="sorteoK(1)" aria-label="Un equipo más">+</button>
+        <span class="muted" id="sorTam"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Que no coincidan</h3>
+      <p class="hint">Elige dos jugadores que no quieres en el mismo equipo. Puedes añadir todas las parejas que necesites.</p>
+      <div class="sor-pair">
+        <select id="sorA" aria-label="Primer jugador"></select>
+        <span class="vs">no con</span>
+        <select id="sorB" aria-label="Segundo jugador"></select>
+      </div>
+      <button type="button" class="btn-secondary" style="width:100%" id="sorAddRegla" onclick="sorteoAddRegla()">+ Añadir regla</button>
+      <p class="sor-msg" id="sorReglaMsg" style="display:none"></p>
+      <div class="sor-chips" id="sorReglas"></div>
+      <p class="hint" id="sorNoReglas" style="margin:10px 0 0">Todavía no hay reglas.</p>
+    </div>
+    <button type="button" class="btn-primary" style="width:100%;font-size:16px;padding:15px" onclick="sortear()">🎲 Sortear equipos</button>
+    <div id="sorResultados"></div>`;
+  renderSorteo();
+  const pg = document.getElementById('sorteoPage');
+  pg.classList.remove('hidden'); pg.scrollTop = 0;
+  document.body.classList.add('ficha-open');
+  if(location.hash !== '#sorteo') location.hash = 'sorteo';
+}
+function cerrarSorteo(){ if(location.hash === '#sorteo') history.back(); else ocultarSorteo(); }
+function ocultarSorteo(){
+  document.getElementById('sorteoPage').classList.add('hidden');
+  document.body.classList.remove('ficha-open');
+}
+function renderSorteo(){ renderSorteoJugadores(); renderSorteoEquipos(); renderSorteoReglas(); }
+function sorteoCambio(){
+  guardarSorteo(); sorteoUltimo = null;
+  const r = document.getElementById('sorResultados'); if(r) r.innerHTML = '';
+}
+function renderSorteoJugadores(){
+  const lista = sorteoLista();
+  document.getElementById('sorLista').innerHTML = lista.map(p => `
+    <div class="convocatoria-row"><div class="conv-row-top">
+      ${p.jug ? avatarHtml(p.jug,'small') : '<span class="dorsal-badge small">+</span>'}
+      <span class="conv-name">${escapeHtml(p.nombre)}${p.guest ? ' <span class="muted small">· invitado</span>' : ''}</span>
+      ${p.guest ? `<button type="button" class="icon-btn danger" onclick="sorteoQuitarInvitado('${p.id}')">🗑</button>` : ''}
+      <label class="switch"><input type="checkbox" ${sorteo.sel[p.id] ? 'checked' : ''} onchange="sorteoToggle('${p.id}', this.checked)"><span class="slider"></span></label>
+    </div></div>`).join('');
+  const n = sorteoParticipantes().length;
+  document.getElementById('sorCount').textContent = n + (n === 1 ? ' jugador' : ' jugadores');
+}
+function renderSorteoEquipos(){
+  const n = sorteoParticipantes().length;
+  const maxK = Math.max(2, n);
+  if(sorteo.k > maxK) sorteo.k = maxK;
+  if(sorteo.k < 2) sorteo.k = 2;
+  document.getElementById('sorK').textContent = sorteo.k;
+  document.getElementById('sorMenos').disabled = sorteo.k <= 2;
+  document.getElementById('sorMas').disabled = sorteo.k >= maxK;
+  let t;
+  if(n >= sorteo.k){ const base = Math.floor(n / sorteo.k), extra = n % sorteo.k; t = extra === 0 ? `de ${base} jugadores` : `de ${base} o ${base + 1} jugadores`; }
+  else t = 'faltan jugadores';
+  document.getElementById('sorTam').textContent = t;
+}
+function renderSorteoReglas(){
+  const part = sorteoParticipantes();
+  const ids = part.map(p => p.id);
+  const nombre = id => { const p = sorteoLista().find(x => x.id === id); return p ? p.nombre : '?'; };
+  const fill = (el, keep) => {
+    el.innerHTML = part.map(p => `<option value="${p.id}">${escapeHtml(p.nombre)}</option>`).join('');
+    if(ids.includes(keep)) el.value = keep;
+  };
+  const a = document.getElementById('sorA'), b = document.getElementById('sorB');
+  fill(a, a.value); fill(b, b.value);
+  if(part.length > 1 && a.value === b.value) b.selectedIndex = (a.selectedIndex + 1) % part.length;
+  document.getElementById('sorReglas').innerHTML = sorteo.rules.map((r,i) => {
+    const activa = ids.includes(r[0]) && ids.includes(r[1]);
+    return `<span class="sor-chip ${activa ? '' : 'off'}" ${activa ? '' : 'title="Uno de los dos no está marcado"'}>${escapeHtml(nombre(r[0]))} ✕ ${escapeHtml(nombre(r[1]))}<button type="button" onclick="sorteoQuitarRegla(${i})" aria-label="Quitar regla">×</button></span>`;
+  }).join('');
+  document.getElementById('sorNoReglas').style.display = sorteo.rules.length ? 'none' : 'block';
+  document.getElementById('sorAddRegla').disabled = part.length < 2;
+}
+function sorteoMarcar(v){ sorteoLista().forEach(p => { sorteo.sel[p.id] = v; }); sorteoCambio(); renderSorteo(); }
+function sorteoToggle(id, v){ sorteo.sel[id] = v; sorteoCambio(); renderSorteoJugadores(); renderSorteoEquipos(); renderSorteoReglas(); }
+function sorteoK(d){ sorteo.k += d; sorteoCambio(); renderSorteoEquipos(); }
+function sorteoAddInvitado(){
+  const inp = document.getElementById('sorInvitado');
+  const nombre = inp.value.trim();
+  if(!nombre) return;
+  const existe = sorteoLista().some(p => p.nombre.toLowerCase() === nombre.toLowerCase());
+  if(existe){ showToast('Ya hay alguien con ese nombre.'); return; }
+  const g = {id:'g' + uid(), nombre};
+  sorteo.guests.push(g); sorteo.sel[g.id] = true;
+  inp.value = '';
+  sorteoCambio(); renderSorteo();
+}
+function sorteoQuitarInvitado(id){
+  sorteo.guests = sorteo.guests.filter(g => g.id !== id);
+  delete sorteo.sel[id];
+  sorteo.rules = sorteo.rules.filter(r => r[0] !== id && r[1] !== id);
+  sorteoCambio(); renderSorteo();
+}
+function sorteoMsgRegla(t){ const m = document.getElementById('sorReglaMsg'); m.textContent = t; m.style.display = t ? 'block' : 'none'; }
+function sorteoAddRegla(){
+  const x = document.getElementById('sorA').value, y = document.getElementById('sorB').value;
+  if(!x || !y) return;
+  if(x === y){ sorteoMsgRegla('Elige dos jugadores distintos.'); return; }
+  if(sorteo.rules.some(r => (r[0] === x && r[1] === y) || (r[0] === y && r[1] === x))){ sorteoMsgRegla('Esa regla ya está añadida.'); return; }
+  sorteo.rules.push([x, y]); sorteoMsgRegla('');
+  sorteoCambio(); renderSorteoReglas();
+}
+function sorteoQuitarRegla(i){ sorteo.rules.splice(i,1); sorteoCambio(); renderSorteoReglas(); }
+
+function sorteoMezclar(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+/* Reparte ids en k equipos de tamaño parejo respetando las parejas que no deben coincidir */
+function sorteoConstruir(ids, k, reglas){
+  const n = ids.length, conflicts = {};
+  ids.forEach(p => { conflicts[p] = {}; });
+  reglas.forEach(r => { if(conflicts[r[0]] && conflicts[r[1]]){ conflicts[r[0]][r[1]] = 1; conflicts[r[1]][r[0]] = 1; } });
+  const grado = p => Object.keys(conflicts[p]).length;
+  const base = Math.floor(n / k), extra = n % k;
+  for(let intento = 0; intento < 4000; intento++){
+    let caps = []; for(let i = 0; i < k; i++) caps.push(base + (i < extra ? 1 : 0));
+    caps = sorteoMezclar(caps);
+    const orden = sorteoMezclar(ids).sort((x,y) => grado(y) - grado(x));
+    const equipos = []; for(let t = 0; t < k; t++) equipos.push([]);
+    let ok = true;
+    for(let q = 0; q < orden.length; q++){
+      const p = orden[q], opciones = [];
+      for(let t = 0; t < k; t++){
+        if(equipos[t].length >= caps[t]) continue;
+        if(!equipos[t].some(m => conflicts[p][m])) opciones.push(t);
+      }
+      if(!opciones.length){ ok = false; break; }
+      equipos[opciones[Math.floor(Math.random() * opciones.length)]].push(p);
+    }
+    if(ok) return equipos.map(sorteoMezclar);
+  }
+  return null;
+}
+function sortear(){
+  const part = sorteoParticipantes();
+  const box = document.getElementById('sorResultados');
+  const fallo = t => { sorteoUltimo = null; box.innerHTML = `<p class="sor-msg" style="margin:14px 0">${t}</p>`; };
+  if(part.length < 2){ fallo('Marca al menos dos jugadores.'); return; }
+  if(part.length < sorteo.k){ fallo('Hay menos jugadores que equipos. Baja el número de equipos.'); return; }
+  const ids = part.map(p => p.id);
+  const activas = sorteo.rules.filter(r => ids.includes(r[0]) && ids.includes(r[1]));
+  const equipos = sorteoConstruir(ids, sorteo.k, activas);
+  if(!equipos){ fallo('Con estas reglas no hay ningún reparto posible. Quita alguna regla o usa menos equipos.'); return; }
+  const nom = {}; part.forEach(p => { nom[p.id] = p.nombre; });
+  sorteoUltimo = equipos.map(t => t.map(id => nom[id]));
+  box.innerHTML = `
+    <div class="sor-grid">${sorteoUltimo.map((t,i) => `
+      <div class="sor-team" style="--tc:${SORTEO_COLORES[i % 8]}">
+        <h4><span class="sor-badge">${i + 1}</span>Equipo ${i + 1}<small>${t.length} jug.</small></h4>
+        <ul>${t.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul>
+      </div>`).join('')}</div>
+    <div class="sor-actions">
+      <button type="button" class="btn-secondary" onclick="sortear()">🔄 Volver a sortear</button>
+      <button type="button" class="btn-secondary" onclick="sorteoCopiar()">Copiar</button>
+      <button type="button" class="btn-small" onclick="sorteoCompartir()">📲 Compartir</button>
+    </div>`;
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function sorteoTexto(){ return sorteoUltimo.map((t,i) => 'Equipo ' + (i + 1) + ': ' + t.join(', ')).join('\n'); }
+async function sorteoCopiar(){
+  if(!sorteoUltimo) return;
+  try{ await navigator.clipboard.writeText(sorteoTexto()); showToast('Equipos copiados.'); }
+  catch(e){ prompt('Copia los equipos:', sorteoTexto()); }
+}
+async function sorteoCompartir(){
+  if(!sorteoUltimo) return;
+  if(navigator.share){
+    try{ await navigator.share({title:'Sorteo de equipos', text:sorteoTexto()}); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  sorteoCopiar();
 }
 
 /* ===================== PIZARRA TÁCTICA (no se guarda, solo en memoria mientras está abierta) ===================== */
@@ -2643,6 +3566,7 @@ async function confirmarBorrarTodo(){
 
 /* ===================== INIT ===================== */
 document.addEventListener('DOMContentLoaded', () => {
+  if(new URLSearchParams(location.search).has('votar')){ iniciarModoVotacion(); return; }
   document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
   document.querySelectorAll('#statsTable th[data-sort]').forEach(th => {
     th.addEventListener('click', () => {
