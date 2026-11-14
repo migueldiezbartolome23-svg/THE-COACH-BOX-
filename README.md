@@ -1,6 +1,6 @@
-# Cadete A · C.D. San Pedro
+# The Coach Box
 
-App de control de minutos jugados y multas del equipo.
+Gestión y táctica para el fútbol base · Cadete A · C.D. San Pedro.
 
 ## Cómo publicarla en GitHub Pages
 
