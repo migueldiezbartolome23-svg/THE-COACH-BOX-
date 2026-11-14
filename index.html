@@ -174,18 +174,22 @@ canvas{max-width:100%;}
 
 .pitch-wrap-h{position:relative;width:100%;aspect-ratio:100/64;background:#2E7D4F;border-radius:10px;overflow:hidden;margin-bottom:10px;touch-action:none;}
 .pizarra-banquillo{display:flex;gap:10px;overflow-x:auto;padding:8px 4px;background:var(--bg);border-radius:10px;-webkit-overflow-scrolling:touch;}
-.banquillo-token{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:44px;cursor:pointer;}
+.banquillo-token{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:54px;cursor:pointer;}
 
 .pizarra-token .slot-avatar,.banquillo-token .slot-avatar{border-radius:50%;background:rgba(255,255,255,.95);border:1.5px solid var(--navy);display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:700;color:var(--navy);margin:0 auto;}
 .pizarra-token .slot-avatar img,.banquillo-token .slot-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-.pizarra-token .slot-avatar{width:18px;height:18px;font-size:7px;border-width:1px;}
-.pizarra-token .slot-name{display:none;}
-.banquillo-token .slot-avatar{width:34px;height:34px;font-size:10px;}
+.pizarra-token .slot-avatar{width:30px;height:30px;font-size:11px;border-width:1.5px;}
+.pizarra-token .slot-name{font-size:9px;font-weight:600;color:#fff;background:rgba(0,0,0,.55);padding:1px 5px;border-radius:6px;white-space:nowrap;max-width:66px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
+.banquillo-token .slot-avatar{width:44px;height:44px;font-size:13px;}
 .banquillo-token .slot-name{font-size:8.5px;color:var(--text);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:44px;}
 
 .rival-avatar{background:#D22630 !important;border-color:#fff !important;color:#fff !important;}
 .pizarra-fullscreen{position:fixed !important;inset:0 !important;z-index:950;width:100vw !important;height:100vh !important;max-width:none !important;max-height:none !important;border-radius:0 !important;display:flex;flex-direction:column;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px)) !important;}
-.pizarra-fullscreen .pitch-wrap-h{flex:1;height:auto;margin-bottom:8px;}
+.pizarra-fullscreen .pitch-wrap-h{flex:1;height:auto;margin-bottom:8px;aspect-ratio:auto !important;}
+.pizarra-fullscreen .pizarra-token .slot-avatar{width:46px;height:46px;font-size:16px;}
+.pizarra-fullscreen .pizarra-token .slot-name{font-size:12px;max-width:100px;padding:1px 7px;}
+.modal.pizarra-wide{max-width:min(98vw,1100px);max-height:96vh;border-radius:16px;padding:12px 10px calc(12px + env(safe-area-inset-bottom,0px));}
+.pizarra-wide .pitch-wrap-h{aspect-ratio:100/74;}
 .pizarra-fullscreen .pizarra-hide-fs{display:none !important;}
 
 .pitch-wrap{position:relative;width:100%;aspect-ratio:68/100;background:#2E7D4F;border-radius:10px;overflow:hidden;margin-bottom:10px;}
@@ -417,6 +421,17 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 .mf-p.sel{background:var(--navy);border-color:var(--navy);color:#fff;}
 .mf-p.sel span{color:#cbd3e6;}
 
+.mf-sanc{background:#FFF8EC;border:1px solid #F2DDB0;border-radius:12px;padding:12px;}
+.mf-sanc label{margin-bottom:8px;}
+.mf-llegada{display:grid;grid-template-columns:1fr 110px;gap:6px 10px;align-items:center;padding:6px 0;border-top:1px solid #F2DDB0;font-size:13px;font-weight:600;color:var(--navy);}
+.mf-llegada input{padding:8px;font-size:14px;}
+.mf-llegada b{grid-column:1 / 3;font-size:12.5px;color:#A05A00;font-weight:600;}
+.mj-sanc{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;gap:8px;background:#FFF8EC;border:1px solid #F2DDB0;border-radius:9px;padding:7px 10px;font-size:12px;color:#7A4A00;line-height:1.3;}
+.mj-sanc button{background:#fff;border:1px solid #E5C98A;border-radius:8px;padding:5px 9px;font-size:11.5px;font-weight:600;color:#7A4A00;cursor:pointer;white-space:nowrap;}
+.mj-sanc.done{opacity:.55;text-decoration:line-through;}
+.cat-extra{display:block;margin-top:3px;font-size:11.5px;line-height:1.35;color:var(--muted);}
+.cat-extra.san{color:#A81B24;font-style:italic;}
+
 @media (min-width:700px){
   .bottom-nav{max-width:720px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 }
@@ -522,6 +537,8 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
           <button type="button" class="btn-secondary" onclick="compartirPendientesPDF()">📄 PDF</button>
         </div>
       </div>
+
+      <div class="card" id="sancionesCard" style="display:none"></div>
 
       <div class="segmented mul-filtro" id="multasFiltro">
         <button type="button" class="seg-btn" data-f="pendientes" onclick="setMultasFiltro('pendientes')">Pendientes</button>
@@ -724,7 +741,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '14/11/2026 - 19:00 The Coach Box';
+const APP_VERSION = '14/11/2026 - 21:00 The Coach Box';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -1273,6 +1290,7 @@ function openModal(html){
   document.getElementById('modalOverlay').classList.remove('hidden');
 }
 function closeModal(){
+  document.getElementById('modalContent').classList.remove('pizarra-wide');
   document.getElementById('modalOverlay').classList.add('hidden');
   document.getElementById('modalContent').innerHTML = '';
 }
@@ -1756,7 +1774,8 @@ function actualizarSelectsCambio(){
   const conv = state.jugadores.filter(j => ids.includes(j.id)).sort(comparaPosicion);
   const opt = j => `<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`;
   saleEl.innerHTML = conv.filter(j => en.has(j.id)).map(opt).join('') || '<option value="">—</option>';
-  entraEl.innerHTML = conv.filter(j => !en.has(j.id)).map(opt).join('') || '<option value="">—</option>';
+  const yaSalieron = new Set(R.subs.filter(c => c.minuto <= m).map(c => c.sale));
+  entraEl.innerHTML = conv.filter(j => !en.has(j.id) && !yaSalieron.has(j.id)).map(opt).join('') || '<option value="">—</option>';
 }
 function agregarCambioRes(){
   const p = partidoRes(), R = window.__res;
@@ -1769,6 +1788,7 @@ function agregarCambioRes(){
   const en = enCampoEn(p, R.subs, minuto);
   if(!en.has(sale)){ showToast('Ese jugador no está en el campo en ese minuto.'); return; }
   if(en.has(entra)){ showToast('Ese jugador ya está en el campo en ese minuto.'); return; }
+  if(R.subs.some(c => c.sale === entra && c.minuto <= minuto)){ showToast('Ese jugador ya fue sustituido y no puede volver a entrar.'); return; }
   R.subs.push({minuto, sale, entra});
   renderResCambios();
   renderResMinutos();
@@ -1881,6 +1901,7 @@ function abrirModalConvocatoria(partidoId){
   convocatoriaImagenPendiente = undefined;
   openModal(`
     <h3>${escapeHtml(partido.rival||'Partido')} · ${formatDateShort(partido.fecha)}</h3>
+    ${bannerSanciones()}
     <p class="hint">Primero decide quién está <strong>convocado</strong> (esto es lo que sale en el PDF). Titular/suplente lo puedes rellenar cuando lo decidas. Los <strong>minutos</strong> ya no se ponen aquí: se calculan solos en el botón <strong>Resultado</strong> con los cambios del partido (y allí también puedes escribirlos a mano).</p>
     <label>Imagen adicional para el PDF (opcional, el escudo siempre sale fijo)
       <input type="file" accept="image/*" id="mConvImagen" onchange="previewImagenConvocatoria(event)">
@@ -2763,6 +2784,7 @@ function abrirPizarra(){
       <button type="button" class="btn-secondary" id="pizarraFsBtn" onclick="toggleFullscreenPizarra()">Pantalla completa</button>
       <button type="button" class="btn-primary" onclick="cerrarPizarra()">Cerrar</button>
     </div>`);
+  document.getElementById('modalContent').classList.add('pizarra-wide');
   renderPizarraBanquillo();
   renderPizarraBanquilloRival();
   renderPizarraCampo();
@@ -2992,11 +3014,13 @@ function abrirModalCambio(){
   const enCampoIds = Object.values(pv.alineacionActual||{});
   const enCampo = state.jugadores.filter(j => enCampoIds.includes(j.id)).sort(comparaPosicion);
   const convocadosIds = state.jugadores.filter(j => (partido.convocatoria||{})[j.id]?.convocado).map(j=>j.id);
-  const disponibles = state.jugadores.filter(j => convocadosIds.includes(j.id) && !enCampoIds.includes(j.id)).sort(comparaPosicion);
+  const salieron = new Set((pv.cambios || []).map(c => c.sale));
+  const disponibles = state.jugadores.filter(j => convocadosIds.includes(j.id) && !enCampoIds.includes(j.id) && !salieron.has(j.id)).sort(comparaPosicion);
   openModal(`
     <h3>Hacer un cambio · Min ${Math.floor(calcularSegundosActuales(pv)/60)}'</h3>
     <label>Sale<select id="mCambioSale">${enCampo.map(j=>`<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`).join('') || '<option value="">— nadie en el campo —</option>'}</select></label>
     <label>Entra<select id="mCambioEntra">${disponibles.map(j=>`<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`).join('') || '<option value="">— sin suplentes disponibles —</option>'}</select></label>
+    ${salieron.size ? '<p class="hint" style="margin-top:-4px">Los jugadores que ya han salido no vuelven a aparecer: no pueden volver a entrar.</p>' : ''}
     <div class="modal-actions">
       <button type="button" class="btn-secondary" onclick="renderModalPartidoEnVivo()">Cancelar</button>
       <button type="button" class="btn-primary" onclick="confirmarCambio()">Confirmar cambio</button>
@@ -3008,6 +3032,7 @@ async function confirmarCambio(){
   const saleId = document.getElementById('mCambioSale').value;
   const entraId = document.getElementById('mCambioEntra').value;
   if(!saleId || !entraId){ showToast('Elige quién sale y quién entra.'); return; }
+  if((pv.cambios || []).some(c => c.sale === entraId)){ showToast('Ese jugador ya fue sustituido y no puede volver a entrar.'); return; }
   const minuto = Math.floor(calcularSegundosActuales(pv)/60);
   const slot = Object.keys(pv.alineacionActual).find(k => pv.alineacionActual[k] === saleId);
   if(slot) pv.alineacionActual[slot] = entraId;
@@ -3338,11 +3363,88 @@ async function sembrarBalonParado(){
   await saveKey(STORAGE_KEYS.config, state.config);
 }
 
+/* ===================== REGLAMENTO: explicaciones y sanciones deportivas ===================== */
+const REGLAMENTO_DEF = [
+  [/^expulsion por no traer/, {d:'Ropa (1,00 €) + No asistencia sin aviso (2,50 €), aplicadas de forma acumulativa: 3,50 €.', s:'Expulsión inmediata del vestuario y del entrenamiento (se considera «No asistencia sin aviso») más la sanción deportiva del fin de semana: Nivel 1 (convocado con minutos limitados) o Nivel 2 (desconvocado).', t:'niveles'}],
+  [/no traer la equipacion de entrenamiento/, {d:'No traer la ropa de entrenamiento adecuada asignada por el club. Conlleva la expulsión inmediata del vestuario y del entrenamiento (ver «Expulsión por no traer la equipación»).', s:'', t:''}],
+  [/retraso injustificado/, {d:'Llegar tarde a la sesión o no estar completamente cambiado a la hora establecida sin haber avisado dentro de los plazos. Plazos límite para avisar: lunes y miércoles hasta las 17:00; viernes hasta las 15:00.', s:'', t:''}],
+  [/aviso fuera de plazo/, {d:'Informar tarde de una inasistencia o retraso, sin una causa de fuerza mayor justificada y comunicada directamente al entrenador.', s:'', t:''}],
+  [/no asistencia a entrenamiento/, {d:'No presentarse a la sesión de entrenamiento sin haber realizado ningún tipo de comunicación previa. La no asistencia justificada solo tiene el castigo deportivo (Nivel 1 o 2) y el jugador queda exento del pago económico.', s:'Falta de compromiso con el grupo: sanción deportiva inmediata para el partido del fin de semana. Nivel 1 (convocado): lista con limitación estricta de minutos. Nivel 2 (desconvocado): fuera de la convocatoria. La gravedad la gestiona el cuerpo técnico.', t:'niveles'}],
+  [/indisciplina en entrenamiento/, {d:'Interrumpir constantemente o hablar mientras el entrenador está explicando la tarea o el ejercicio. Norma grupal: si el grupo no guarda silencio, el entrenador espera el tiempo asignado a la explicación; si se agota, se elimina el ejercicio programado y se hace trabajo físico.', s:'Expulsión inmediata del entrenamiento en curso y desconvocatoria para el siguiente partido. Si la conducta es diaria o reiterada, suspensión de 1 mes de entrenamientos y partidos.', t:'texto'}],
+  [/movil durante la charla/, {d:'Estar con el teléfono móvil durante una charla del entrenador.', s:'', t:''}],
+  [/vestuario sucio/, {d:'Dejar el vestuario sucio, desordenado o sin barrer: 1,00 € a cada miembro del equipo.', s:'', t:''}],
+  [/no recoger el material/, {d:'No colaborar colectivamente en la recogida del material de entrenamiento utilizado en el campo: 1,00 € a cada miembro del equipo.', s:'', t:''}],
+  [/pertenencias/, {d:'Dejarse alguna pertenencia o prenda olvidada en el vestuario: 0,50 € por unidad.', s:'', t:''}],
+  [/llegar tarde a un partido/, {d:'Se considera retraso llegar después del límite fijado de 45 minutos antes de la hora de citación oficial.', s:'Por cada minuto de retraso sobre la hora fijada, el jugador permanece ese mismo tiempo en el banquillo sin opción a disputar minutos de juego.', t:'tiempo'}],
+  [/no asistir al partido/, {d:'No comunicar la ausencia con un mínimo de 48 horas de antelación al encuentro.', s:'', t:''}],
+  [/llegar cambiado/, {d:'Acudir a la citación del partido ya cambiado desde casa (con espinilleras, medias o botas puestas).', s:'', t:''}],
+  [/olvido de ropa o material/, {d:'Dejarse en casa la ropa de competición, espinilleras, botas, etc.: 1,00 € por unidad.', s:'', t:''}],
+  [/olvido de ropa tras/, {d:'Dejarse ropa u objetos olvidados en el vestuario tras finalizar el encuentro: 1,00 € por unidad.', s:'', t:''}],
+  [/ropa oficial/, {d:'No traer la ropa oficial del club designada para el día de partido.', s:'', t:''}],
+  [/indisciplina en charla/, {d:'Interrumpir o hablar mientras el cuerpo técnico realiza la explicación táctica.', s:'', t:''}],
+  [/movil en charla/, {d:'Utilizar el teléfono durante las charlas previas o del descanso.', s:'', t:''}],
+  [/movil en el banquillo/, {d:'Queda estrictamente prohibido sacar o usar el teléfono móvil en el banquillo durante el transcurso del partido.', s:'', t:''}],
+  [/ducharse/, {d:'No ducharse en las instalaciones tras el partido o ducharse utilizando calzoncillos.', s:'', t:''}],
+  [/^tarjeta amarilla/, {d:'Recibida por protestar al árbitro, encararse con rivales o público.', s:'', t:''}],
+  [/^segunda amarilla/, {d:'Expulsión derivada por protestas o encaramientos.', s:'', t:''}],
+  [/^tarjeta roja/, {d:'Expulsión directa motivada por protestar o encararse.', s:'', t:''}],
+  [/falta de respeto/, {d:'Acciones de desconsideración o insultos entre compañeros, cuerpo técnico, directiva o rivales.', s:'Expulsión inmediata del entrenamiento o sustitución obligatoria si ocurre durante un partido. Si el comportamiento se vuelve reiterativo, suspensiones progresivas: 1 semana de exclusión total (entrenamientos y partidos), seguido de 1 mes, 2 meses y así sucesivamente.', t:'escalada'}],
+  [/uso general/, {d:'Cualquier interacción no autorizada con el móvil dentro del vestuario o en el terreno de juego (fuera de las charlas, que tienen su sanción específica).', s:'', t:''}]
+];
+const SANCION_TIPOS = {'':'Sin sanción deportiva', texto:'Sanción deportiva (solo texto)', tiempo:'Tiempo sin jugar por retraso (pide la hora de llegada)', niveles:'Nivel 1 o 2 (minutos limitados / desconvocado)', escalada:'Escalada por reincidencia (expulsión, 1 semana, 1 mes…)'};
+function reglamentoDe(c){
+  const t = normNombre(c.motivo);
+  const hit = REGLAMENTO_DEF.find(([re]) => re.test(t));
+  const def = hit ? hit[1] : {d:'', s:'', t:''};
+  return {
+    descripcion: c.descripcion !== undefined ? c.descripcion : def.d,
+    sancion: c.sancion !== undefined ? c.sancion : def.s,
+    tipo: c.sancionTipo !== undefined ? c.sancionTipo : def.t
+  };
+}
+function toMin(hhmm){ if(!hhmm || !/^\d{1,2}:\d{2}$/.test(hhmm)) return null; const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; }
+function textoEscalada(n){
+  if(n <= 1) return 'Primera vez: expulsión inmediata del entrenamiento (o sustitución obligatoria si es en partido).';
+  if(n === 2) return 'Reincidencia (2.ª vez): 1 semana de exclusión total (entrenamientos y partidos).';
+  if(n === 3) return 'Reincidencia (3.ª vez): 1 mes de exclusión total (entrenamientos y partidos).';
+  return `Reincidencia (${n}.ª vez): ${n - 2} meses de exclusión total (entrenamientos y partidos).`;
+}
+function sancionesPendientes(){
+  return state.multas.filter(m => m.sancion && m.sancion.texto && !m.sancion.cumplida).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+}
+function bannerSanciones(){
+  const l = sancionesPendientes();
+  if(!l.length) return '';
+  return `<div class="alert-banner" style="display:block;margin-bottom:10px"><strong>⚖️ Sanciones deportivas pendientes</strong>${l.map(m => {
+    const j = state.jugadores.find(x => x.id === m.jugadorId);
+    return `<div style="margin-top:4px;font-size:12.5px"><strong>${j ? escapeHtml(j.dorsal + ' · ' + formatName(j.nombre)) : '—'}</strong>: ${escapeHtml(m.sancion.texto)}</div>`;
+  }).join('')}</div>`;
+}
+async function toggleSancionCumplida(id){
+  const m = state.multas.find(x => x.id === id);
+  if(!m || !m.sancion) return;
+  m.sancion = {...m.sancion, cumplida: !m.sancion.cumplida};
+  await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: m});
+  renderMultasTab();
+}
+function renderSancionesPendientes(){
+  const el = document.getElementById('sancionesCard');
+  if(!el) return;
+  const l = sancionesPendientes();
+  if(!l.length){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = `<h3>⚖️ Sanciones deportivas pendientes</h3>` + l.map(m => {
+    const j = state.jugadores.find(x => x.id === m.jugadorId);
+    return `<div class="mj-sanc" style="margin-top:8px"><span><strong>${j ? escapeHtml(j.dorsal + ' · ' + formatName(j.nombre)) : '—'}</strong> — ${escapeHtml(m.sancion.texto)}<br><span class="muted small">${escapeHtml(m.motivo)} · ${formatDateShort(m.fecha)}</span></span><button type="button" onclick="toggleSancionCumplida('${m.id}')">✓ Cumplida</button></div>`;
+  }).join('');
+}
+
 /* ===================== MULTAS ===================== */
 function renderMultasTab(){
   const f = document.getElementById('ingresoFecha');
   if(f && !f.value) f.value = todayISO();
   renderMultasResumen();
+  renderSancionesPendientes();
   renderMultasLista();
   renderMultasAlert();
   renderIngresosList();
@@ -3361,9 +3463,9 @@ function grupoMotivo(c){
   return 'partido';
 }
 const GRUPO_LABEL = {entreno:'Entrenamiento', partido:'Partido', ambos:'Entrenamiento y partido'};
-let multaForm = {motivo:null, jugadores:[], cambiando:false, grupo:null};
+let multaForm = {motivo:null, jugadores:[], cambiando:false, grupo:null, limite:null, limiteManual:false, llegadas:{}, nivel:null};
 function abrirModalMulta(jugadorId){
-  multaForm = {motivo:null, jugadores: jugadorId ? [jugadorId] : [], cambiando:false, grupo:null};
+  multaForm = {motivo:null, jugadores: jugadorId ? [jugadorId] : [], cambiando:false, grupo:null, limite:null, limiteManual:false, llegadas:{}, nivel:null};
   openModal(`
     <h3>Nueva multa</h3>
     <div class="mf-label" style="margin-top:6px"><span>1 · ¿Quién?</span><span><a onclick="multaTodos(true)">Todos</a> · <a onclick="multaTodos(false)">Ninguno</a></span></div>
@@ -3372,10 +3474,11 @@ function abrirModalMulta(jugadorId){
     <div class="segmented mul-filtro" id="mfGrupos" style="margin-bottom:8px"></div>
     <div class="mf-list" id="mfMotivos"></div>
     <div id="mfCustom" style="display:none;margin-top:8px"><input type="text" id="multaMotivoCustom" placeholder="Describe el motivo (ej: Tiró el balón al río)"></div>
+    <div id="mfSancion"></div>
     <div class="mf-label">3 · Importe y fecha</div>
     <div class="form-grid">
       <label>Importe (€)<input type="number" inputmode="decimal" id="multaImporte" step="0.5" min="0"></label>
-      <label>Fecha<input type="date" id="multaFecha" value="${todayISO()}"></label>
+      <label>Fecha<input type="date" id="multaFecha" value="${todayISO()}" onchange="multaSancionRender()"></label>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -3409,6 +3512,78 @@ function multaRender(){
     <button type="button" class="mf-p ${multaForm.jugadores.includes(j.id) ? 'sel' : ''}" onclick="multaToggleJug('${j.id}')"><span>${j.dorsal}</span>${escapeHtml(formatName(j.nombre))}</button>`).join('');
   const n = multaForm.jugadores.length;
   document.getElementById('mfBtn').textContent = n > 1 ? `Añadir a ${n} jugadores` : 'Añadir multa';
+  multaSancionRender();
+}
+function multaSancionRender(){
+  const el = document.getElementById('mfSancion');
+  if(!el) return;
+  const c = state.catalogo.find(x => x.id === multaForm.motivo);
+  const r = c ? reglamentoDe(c) : null;
+  if(!r || !r.tipo || (r.tipo === 'texto' && !r.sancion)){ el.innerHTML = ''; return; }
+  const jugs = multaForm.jugadores.map(id => state.jugadores.find(j => j.id === id)).filter(Boolean);
+  let html = '<div class="mf-label">⚖️ Sanción deportiva</div><div class="mf-sanc">';
+  if(r.tipo === 'tiempo'){
+    if(!multaForm.limiteManual){
+      const fecha = (document.getElementById('multaFecha') || {}).value;
+      const pt = state.partidos.find(p => p.fecha === fecha && p.hora);
+      multaForm.limite = pt ? pt.hora : multaForm.limite;
+    }
+    html += `<p class="hint" style="margin:0 0 8px">${escapeHtml(r.sancion)}</p>
+      <label>Hora límite (citación)<input type="time" value="${multaForm.limite || ''}" oninput="multaSetLimite(this.value)"></label>`;
+    html += jugs.length
+      ? jugs.map(j => `<div class="mf-llegada"><span>${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</span><input type="time" value="${multaForm.llegadas[j.id] || ''}" oninput="multaSetLlegada('${j.id}', this.value)" aria-label="Hora de llegada"><b id="mfRes_${j.id}"></b></div>`).join('')
+      : '<p class="hint" style="margin:0">Elige primero al jugador y pon la hora a la que llegó.</p>';
+  } else if(r.tipo === 'niveles'){
+    html += `<div class="segmented mul-filtro" style="margin-bottom:8px">
+        <button type="button" class="seg-btn ${multaForm.nivel === 1 ? 'active' : ''}" onclick="multaSetNivel(1)">Nivel 1</button>
+        <button type="button" class="seg-btn ${multaForm.nivel === 2 ? 'active' : ''}" onclick="multaSetNivel(2)">Nivel 2</button></div>
+      <p class="hint" style="margin:0 0 6px"><strong>Nivel 1:</strong> convocado con minutos limitados (sale desde el banquillo). <strong>Nivel 2:</strong> desconvocado del próximo partido.</p>
+      ${r.sancion ? `<p class="hint" style="margin:0">${escapeHtml(r.sancion)}</p>` : ''}`;
+  } else if(r.tipo === 'escalada'){
+    html += `<p class="hint" style="margin:0 0 6px">${escapeHtml(r.sancion)}</p>` + (jugs.length ? jugs.map(j => {
+      const n = state.multas.filter(m => m.jugadorId === j.id && m.motivo === c.motivo).length + 1;
+      return `<div class="mf-llegada" style="grid-template-columns:1fr"><span>${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</span><b style="grid-column:1">${escapeHtml(textoEscalada(n))}</b></div>`;
+    }).join('') : '<p class="hint" style="margin:0">Elige al jugador para ver qué le corresponde.</p>');
+  } else {
+    html += `<p class="hint" style="margin:0">${escapeHtml(r.sancion)}</p>`;
+  }
+  el.innerHTML = html + '</div>';
+  if(r.tipo === 'tiempo') multaActualizarResultados();
+}
+function multaMinutosRetraso(jid){
+  const a = toMin(multaForm.limite), b = toMin(multaForm.llegadas[jid]);
+  return (a === null || b === null) ? null : b - a;
+}
+function multaActualizarResultados(){
+  multaForm.jugadores.forEach(id => {
+    const el = document.getElementById('mfRes_' + id);
+    if(!el) return;
+    const d = multaMinutosRetraso(id);
+    el.textContent = d === null ? 'Pon la hora de llegada' : (d <= 0 ? '✓ Llegó a tiempo: no hay retraso' : `⏱ ${d} min de retraso → ${d} min sin jugar (banquillo)`);
+  });
+}
+function multaSetLimite(v){ multaForm.limite = v; multaForm.limiteManual = true; multaActualizarResultados(); }
+function multaSetLlegada(id, v){ multaForm.llegadas[id] = v; multaActualizarResultados(); }
+function multaSetNivel(n){ multaForm.nivel = n; multaSancionRender(); }
+/* Construye la sanción deportiva que corresponde a una multa concreta (o null si no aplica). */
+function construirSancion(c, jugadorId, motivoTexto){
+  const r = reglamentoDe(c);
+  if(!r.tipo) return null;
+  if(r.tipo === 'tiempo'){
+    const d = multaMinutosRetraso(jugadorId);
+    if(d === null || d <= 0) return null;
+    return {tipo:'tiempo', minutos:d, limite:multaForm.limite, llegada:multaForm.llegadas[jugadorId], cumplida:false,
+      texto:`${d} min sin jugar en el banquillo (llegó a las ${multaForm.llegadas[jugadorId]}, límite ${multaForm.limite})`};
+  }
+  if(r.tipo === 'niveles'){
+    return {tipo:'niveles', nivel:multaForm.nivel, cumplida:false,
+      texto: multaForm.nivel === 1 ? 'Nivel 1: convocado con minutos limitados en el próximo partido' : 'Nivel 2: desconvocado del próximo partido'};
+  }
+  if(r.tipo === 'escalada'){
+    const n = state.multas.filter(m => m.jugadorId === jugadorId && m.motivo === motivoTexto).length + 1;
+    return {tipo:'escalada', veces:n, cumplida:false, texto:textoEscalada(n)};
+  }
+  return r.sancion ? {tipo:'texto', cumplida:false, texto:r.sancion} : null;
 }
 function multaCambiarMotivo(){ multaForm.cambiando = true; multaRender(); }
 function multaSetGrupo(g){ multaForm.grupo = g; multaRender(); }
@@ -3452,6 +3627,13 @@ async function registrarMulta(){
   if(!multaForm.motivo){ showToast('Elige qué ha pasado.'); return; }
   if(!multaForm.jugadores.length){ showToast('Elige al menos un jugador.'); return; }
   if(isNaN(importe) || !fecha){ showToast('Revisa el importe y la fecha.'); return; }
+  const catSel = state.catalogo.find(x => x.id === multaForm.motivo);
+  const rSel = catSel ? reglamentoDe(catSel) : null;
+  if(rSel && rSel.tipo === 'tiempo'){
+    if(!toMin(multaForm.limite)){ showToast('Pon la hora límite.'); return; }
+    if(multaForm.jugadores.some(id => !toMin(multaForm.llegadas[id]))){ showToast('Pon la hora de llegada de cada jugador.'); return; }
+  }
+  if(rSel && rSel.tipo === 'niveles' && !multaForm.nivel){ showToast('Elige Nivel 1 o Nivel 2.'); return; }
   let motivoTexto;
   if(multaForm.motivo === 'custom'){
     motivoTexto = (document.getElementById('multaMotivoCustom').value || '').trim() || 'Otro';
@@ -3459,12 +3641,13 @@ async function registrarMulta(){
     const cat = state.catalogo.find(c => c.id === multaForm.motivo);
     motivoTexto = cat ? cat.motivo : 'Otro';
   }
-  const nuevas = multaForm.jugadores.map(jugadorId => ({id:uid(), jugadorId, motivo:motivoTexto, importeBase:importe, fecha, pagada:false, fechaPago:null, importeFinal:null}));
+  const nuevas = multaForm.jugadores.map(jugadorId => ({id:uid(), jugadorId, motivo:motivoTexto, importeBase:importe, fecha, pagada:false, fechaPago:null, importeFinal:null, sancion: (catSel && multaForm.motivo !== 'custom') ? construirSancion(catSel, jugadorId, motivoTexto) : null}));
   nuevas.forEach(m => { state.multas.push(m); if(nuevas.length === 1) multasAbiertos[m.jugadorId] = true; });
   closeModal();
   for(const m of nuevas) await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: m});
   renderMultasTab();
-  showToast(nuevas.length > 1 ? `Multa añadida a ${nuevas.length} jugadores.` : 'Multa registrada.');
+  const sa = nuevas.find(m => m.sancion);
+  showToast(nuevas.length > 1 ? `Multa añadida a ${nuevas.length} jugadores.` : (sa ? `Multa registrada. Sanción: ${sa.sancion.texto}` : 'Multa registrada.'));
 }
 async function marcarPagada(id, pagada){
   const m = state.multas.find(x => x.id === id);
@@ -3530,6 +3713,7 @@ function filaMultaHtml(m){
         ? `<button type="button" class="btn-undo" onclick="marcarPagada('${m.id}', false)">Deshacer</button>`
         : `<button type="button" class="btn-cobrar" onclick="marcarPagada('${m.id}', true)">✓ Cobrar</button>`}
       <button type="button" class="icon-btn danger" onclick="borrarMulta('${m.id}')">🗑</button>
+      ${m.sancion && m.sancion.texto ? `<div class="mj-sanc ${m.sancion.cumplida ? 'done' : ''}"><span>⚖️ ${escapeHtml(m.sancion.texto)}</span><button type="button" onclick="toggleSancionCumplida('${m.id}')">${m.sancion.cumplida ? 'Deshacer' : '✓ Cumplida'}</button></div>` : ''}
     </div>`;
 }
 function renderMultasLista(){
@@ -3790,17 +3974,26 @@ async function generarReglamentoPDF(){
   secciones.forEach(([t, lista]) => {
     titulo(t);
     lista.forEach(c => {
-      const lineas = doc.splitTextToSize(c.motivo, CW - 38);
-      const h = Math.max(7.5, lineas.length * 4.8 + 3);
+      const r = reglamentoDe(c);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10);
+      const lM = doc.splitTextToSize(c.motivo, CW - 38);
+      doc.setFont('helvetica','normal'); doc.setFontSize(9);
+      const lD = r.descripcion ? doc.splitTextToSize(r.descripcion, CW - 10) : [];
+      doc.setFont('helvetica','italic');
+      const lS = r.sancion ? doc.splitTextToSize('Sanción deportiva: ' + r.sancion, CW - 14) : [];
+      const h = lM.length * 4.8 + lD.length * 4.2 + lS.length * 4.2 + 4.5;
       salto(h);
-      doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...PDF_TXT);
-      doc.text('•', M + 3, y); doc.text(lineas, M + 8, y);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...PDF_NAVY);
+      doc.text('•', M + 3, y); doc.text(lM, M + 8, y);
       const tt = fmt(Number(c.importe) || 0);
-      doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+      doc.setFontSize(9.5);
       const pw = doc.getTextWidth(tt) + 5.5;
       doc.setFillColor(...PDF_PALE); doc.setDrawColor(245,200,203); doc.setLineWidth(0.25);
       doc.roundedRect(W - M - pw, y - 4.4, pw, 6.4, 1.4, 1.4, 'FD');
       doc.setTextColor(...PDF_RED); doc.text(tt, W - M - pw / 2, y, {align:'center'});
+      let yy = y + lM.length * 4.8;
+      if(lD.length){ doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...PDF_TXT); doc.text(lD, M + 8, yy); yy += lD.length * 4.2; }
+      if(lS.length){ doc.setFont('helvetica','italic'); doc.setFontSize(9); doc.setTextColor(...PDF_RED); doc.text(lS, M + 10, yy); }
       y += h;
     });
     y += 6;
@@ -3808,7 +4001,8 @@ async function generarReglamentoPDF(){
   salto(40);
   titulo('OBSERVACIONES IMPORTANTES');
   [['Plazo de abono:', 'todas las multas económicas deberán abonarse íntegramente en un plazo máximo de 2 semanas desde el momento de la infracción.'],
-   ['Recargo por demora:', 'cada semana de retraso en el pago, tras expirar el plazo de 2 semanas, devenga un recargo acumulativo de 0,50 € semanales.']
+   ['Recargo por demora:', 'cada semana de retraso en el pago, tras expirar el plazo de 2 semanas, devenga un recargo acumulativo de 0,50 € semanales.'],
+   ['Sanciones deportivas adicionales:', 'el cuerpo técnico se reserva la potestad de aplicar castigos deportivos complementarios (no convocatorias, suplencias obligatorias, etc.) según la gravedad, la reincidencia o el perjuicio causado al grupo.']
   ].forEach(([b, t]) => {
     doc.setFontSize(9.5);
     doc.setFont('helvetica','bold'); const bw = doc.getTextWidth(b + ' ');
@@ -4425,7 +4619,7 @@ async function toggleDiaEntreno(dia){
 function renderCatalogoList(){
   document.getElementById('catalogoList').innerHTML = state.catalogo.map(c => `
     <div class="list-row">
-      <span class="list-name">${escapeHtml(c.motivo)}<br><span class="muted small">${c.importe.toFixed(2)}€ · ${GRUPO_LABEL[grupoMotivo(c)]}</span></span>
+      <span class="list-name">${escapeHtml(c.motivo)}<br><span class="muted small">${c.importe.toFixed(2)}€ · ${GRUPO_LABEL[grupoMotivo(c)]}</span>${(() => { const r = reglamentoDe(c); return (r.descripcion ? `<span class="cat-extra">${escapeHtml(r.descripcion)}</span>` : '') + (r.sancion ? `<span class="cat-extra san">Sanción deportiva: ${escapeHtml(r.sancion)}</span>` : ''); })()}</span>
       <div class="row-actions">
         <button class="icon-btn" onclick="abrirModalMotivo('${c.id}')">✎</button>
         <button class="icon-btn danger" onclick="borrarMotivo('${c.id}')">🗑</button>
@@ -4439,6 +4633,9 @@ function abrirModalMotivo(id){
     <label>Motivo<input type="text" id="mMotTexto" value="${cat ? escapeHtml(cat.motivo) : ''}"></label>
     <label>Importe (€)<input type="number" id="mMotImporte" step="0.5" value="${cat ? cat.importe : ''}"></label>
     <label>Se usa en<select id="mMotGrupo">${['entreno','partido','ambos'].map(g => `<option value="${g}" ${(cat ? grupoMotivo(cat) : 'entreno') === g ? 'selected' : ''}>${GRUPO_LABEL[g]}</option>`).join('')}</select></label>
+    <label>Explicación (sale en el reglamento)<textarea id="mMotDesc" rows="3" placeholder="Qué se considera esta falta">${cat ? escapeHtml(reglamentoDe(cat).descripcion) : ''}</textarea></label>
+    <label>Sanción deportiva<textarea id="mMotSancion" rows="3" placeholder="Opcional. Ej: Expulsión del entrenamiento y desconvocatoria">${cat ? escapeHtml(reglamentoDe(cat).sancion) : ''}</textarea></label>
+    <label>Cómo se aplica en la app<select id="mMotTipo">${Object.entries(SANCION_TIPOS).map(([k, v]) => `<option value="${k}" ${(cat ? reglamentoDe(cat).tipo : '') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="guardarMotivo('${id||''}')">Guardar</button>
@@ -4449,13 +4646,16 @@ async function guardarMotivo(id){
   const importe = parseFloat(document.getElementById('mMotImporte').value);
   if(!motivo || isNaN(importe)){ showToast('Completa motivo e importe.'); return; }
   const grupo = document.getElementById('mMotGrupo').value;
+  const descripcion = document.getElementById('mMotDesc').value.trim();
+  const sancion = document.getElementById('mMotSancion').value.trim();
+  const sancionTipo = document.getElementById('mMotTipo').value;
   let catFinal;
   if(id){
     const c = state.catalogo.find(x => x.id === id);
-    c.motivo = motivo; c.importe = importe; c.grupo = grupo;
+    c.motivo = motivo; c.importe = importe; c.grupo = grupo; c.descripcion = descripcion; c.sancion = sancion; c.sancionTipo = sancionTipo;
     catFinal = c;
   } else {
-    catFinal = {id:uid(), motivo, importe, grupo};
+    catFinal = {id:uid(), motivo, importe, grupo, descripcion, sancion, sancionTipo};
     state.catalogo.push(catFinal);
   }
   await guardarColeccion(STORAGE_KEYS.catalogo, {tipo:'upsert', item: catFinal});
