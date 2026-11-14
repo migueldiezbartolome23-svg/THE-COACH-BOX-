@@ -393,6 +393,9 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 .bp-opt.sel{background:var(--navy);color:#fff;border-color:var(--navy);}
 .bp-opt.sel small{color:#cbd3e6;}
 .bp-opt.no{opacity:.45;text-decoration:line-through;}
+.bp-opt.extra{border-style:dashed;font-weight:500;color:var(--muted);}
+.bp-opt.used{opacity:.4;}
+.bp-opt.sel.extra{color:#fff;}
 .bp-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid var(--border);}
 .bp-num{font-family:'Oswald',sans-serif;font-weight:600;min-width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;padding:0 4px;}
 .bp-opts{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
@@ -691,7 +694,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '14/11/2026 - 13:30 multas y tareas';
+const APP_VERSION = '14/11/2026 - 15:00 multas y tareas';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -3196,16 +3199,29 @@ function renderBPPartido(pid){
     const jugadas = state.balonParado.filter(b => (b.tipo || 'ataque') === tipo);
     if(!jugadas.length) return '';
     return `<div class="res-sub">${titulo}</div>` + jugadas.map(b => {
-      const asig = bpAsigOrdenadas(b).map(a => ({...a, ids: haytit ? a.ids.filter(id => estadoJugadorPartido(p, id) === 'tit') : a.ids}));
+      const asig = bpAsigOrdenadas(b).map(a => ({...a, ids: (haytit && b.tipo === 'ataque') ? a.ids.filter(id => estadoJugadorPartido(p, id) === 'tit') : a.ids}));
       const filas = asig.map(a => {
         const sel = elecc.find(e => e.playId === b.id && String(e.num) === a.num);
-        const estados = a.ids.map(id => estadoJugadorPartido(p, id));
-        const ningunoDisp = a.ids.length === 0;
+        const COMODIN = ['3','4','5'];
+        const extras = [], extraDe = {};
+        /* Si en el 3, 4 o 5 no queda ningún titular, lo cubre uno de los que sobran en otro de esos tres números (el que tiene 2 o más titulares). */
+        if(b.tipo === 'ataque' && COMODIN.includes(a.num) && a.ids.length === 0){
+          asig.filter(o => o.num !== a.num && COMODIN.includes(o.num) && o.ids.length >= 2)
+              .forEach(o => o.ids.forEach(id => { if(!extras.includes(id)){ extras.push(id); extraDe[id] = o.num; } }));
+        }
+        const opt = (id, extra) => {
+          const j = state.jugadores.find(x => x.id === id);
+          if(!j) return '';
+          const est = estadoJugadorPartido(p, id);
+          const otro = elecc.find(e => e.playId === b.id && e.jugadorId === id && String(e.num) !== a.num);
+          return `<button type="button" class="bp-opt ${est === 'no' ? 'no' : ''} ${extra ? 'extra' : ''} ${otro ? 'used' : ''} ${sel && sel.jugadorId === id ? 'sel' : ''}" data-num="${escapeHtml(a.num)}" onclick="bpElegir('${pid}','${b.id}',this.dataset.num,'${id}')">${escapeHtml(formatName(j.nombre))}${otro ? `<small>en el ${escapeHtml(otro.num)}</small>` : (extra && extraDe[id] ? `<small>del ${escapeHtml(extraDe[id])}</small>` : (b.tipo === 'defensa' && est === 'sup' ? '<small>S</small>' : ''))}</button>`;
+        };
+        const ningunoDisp = a.ids.length === 0 && extras.length === 0;
         return `<div class="bp-row">
           <span class="bp-num">${escapeHtml(a.num)}</span>
           <div class="bp-opts">
-            ${a.ids.map((id, k) => { const j = state.jugadores.find(x => x.id === id); const est = estados[k];
-              return `<button type="button" class="bp-opt ${est === 'no' ? 'no' : ''} ${sel && sel.jugadorId === id ? 'sel' : ''}" data-num="${escapeHtml(a.num)}" onclick="bpElegir('${pid}','${b.id}',this.dataset.num,'${id}')">${escapeHtml(formatName(j.nombre))}${ET[est] ? `<small>${ET[est]}</small>` : ''}</button>`; }).join('')}
+            ${a.ids.map(id => opt(id, false)).join('')}
+            ${extras.length ? `<span class="muted small" style="align-self:center">· puede cubrir:</span>${extras.map(id => opt(id, true)).join('')}` : ''}
             ${ningunoDisp ? '<span class="muted small" style="align-self:center">⚠ Ningún titular para este número</span>' : ''}
           </div>
         </div>`;
@@ -3220,16 +3236,19 @@ function renderBPPartido(pid){
     }).join('');
   };
   cont.innerHTML = cab + `
-    ${haytit ? '<p class="hint">Solo aparecen los <strong>titulares</strong> (el once de la alineación o los marcados como titulares en la convocatoria). Toca uno para elegirlo en este partido.</p>'
-             : '<p class="hint" style="color:var(--red-dark)">Este partido aún no tiene titulares marcados, así que se muestran todos. Pon la alineación o marca los titulares en la convocatoria para que solo salgan ellos.</p>'}
+    ${haytit ? '<p class="hint">En <strong>ataque</strong> solo aparecen los titulares (el once de la alineación o los marcados como titulares en la convocatoria). En <strong>defensa</strong> salen todos los convocados (S = suplente). Toca uno para elegirlo en este partido. En ataque, si en el 3, 4 o 5 no hay ningún titular, lo cubre uno de los que sobran en otro de esos tres números (salen después de «puede cubrir»). Si ya está en otro número de la jugada, aparece atenuado.</p>'
+             : '<p class="hint" style="color:var(--red-dark)">Este partido aún no tiene titulares marcados, así que se muestran todos. Pon la alineación o marca los titulares en la convocatoria para que en ataque solo salgan ellos.</p>'}
     ${seccion('ataque', 'Ataque')}${seccion('defensa', 'Defensa')}` + cierre;
 }
 async function bpElegir(pid, playId, num, jid){
   const p = state.partidos.find(x => x.id === pid);
   if(!p) return;
   if(estadoJugadorPartido(p, jid) === 'no'){ showToast('No está convocado en este partido.'); return; }
-  if(state.jugadores.some(j => estadoJugadorPartido(p, j.id) === 'tit') && estadoJugadorPartido(p, jid) !== 'tit'){ showToast('Solo pueden ser titulares.'); return; }
+  const playSel = state.balonParado.find(x => x.id === playId);
+  if(playSel && playSel.tipo === 'ataque' && state.jugadores.some(j => estadoJugadorPartido(p, j.id) === 'tit') && estadoJugadorPartido(p, jid) !== 'tit'){ showToast('Solo pueden ser titulares.'); return; }
   let elecc = Array.isArray(p.bpElecciones) ? [...p.bpElecciones] : (p.bpElecciones ? Object.values(p.bpElecciones) : []);
+  const otro = elecc.find(e => e.playId === playId && e.jugadorId === jid && String(e.num) !== String(num));
+  if(otro){ showToast(`Ya está en el ${otro.num} de esta jugada. Quítalo de ahí primero.`); return; }
   const ya = elecc.find(e => e.playId === playId && String(e.num) === String(num));
   elecc = elecc.filter(e => !(e.playId === playId && String(e.num) === String(num)));
   if(!(ya && ya.jugadorId === jid)) elecc.push({playId, num: String(num), jugadorId: jid});
