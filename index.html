@@ -388,6 +388,15 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 .bp-zoom.zoomed .bp-img{width:260%;max-width:none;}
 .bp-pdf{width:100%;height:calc(100vh - 200px);border:none;border-radius:12px;background:#fff;}
 
+.bp-opt{border:1px solid var(--border);background:#fff;border-radius:20px;padding:6px 11px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;}
+.bp-opt small{font-weight:700;color:var(--muted);margin-left:5px;font-size:10px;}
+.bp-opt.sel{background:var(--navy);color:#fff;border-color:var(--navy);}
+.bp-opt.sel small{color:#cbd3e6;}
+.bp-opt.no{opacity:.45;text-decoration:line-through;}
+.bp-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid var(--border);}
+.bp-num{font-family:'Oswald',sans-serif;font-weight:600;min-width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;padding:0 4px;}
+.bp-opts{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
+
 @media (min-width:700px){
   .bottom-nav{max-width:720px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 }
@@ -682,7 +691,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '13/11/2026 - 20:05 multas y tareas';
+const APP_VERSION = '14/11/2026 - 12:00 multas y tareas';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -1492,6 +1501,7 @@ function renderMinutosTab(){
         <div class="row-actions">
           <button class="btn-small" onclick="abrirModalConvocatoria('${p.id}')">Convocatoria</button>
           <button class="btn-small" onclick="abrirModalAlineacion('${p.id}')">Alineación</button>
+          <button class="btn-small" onclick="abrirModalBPPartido('${p.id}')">Balón parado</button>
           <button class="btn-small" onclick="abrirModalResultado('${p.id}')">Resultado</button>
           <button class="icon-btn" onclick="abrirModalPartido('${p.id}')">✎</button>
           <button class="icon-btn" onclick="generarConvocatoriaPDF('${p.id}')">PDF</button>
@@ -3056,9 +3066,11 @@ const TAREAS_DEF = [
   {id:'botellines', icono:'💧', nombre:'Rellenar botellines'},
   {id:'material', icono:'🎒', nombre:'Llevar material'}
 ];
+function tareaIds(t){ return Array.isArray(t.jugadorIds) ? t.jugadorIds : (t.jugadorIds ? Object.values(t.jugadorIds) : (t.jugadorId ? [t.jugadorId] : [])); }
 function tareaItem(id){
   const t = state.tareas.find(x => x.id === id);
-  return t ? {...t, historial: t.historial || []} : {id, jugadorId:null, fechaAsignacion:'', historial:[]};
+  if(!t) return {id, jugadorIds:[], fechaAsignacion:'', historial:[]};
+  return {id, jugadorIds:[...tareaIds(t)], fechaAsignacion:t.fechaAsignacion || '', historial: t.historial ? normalizarArray(t.historial) : []};
 }
 function jugadoresTareas(){ return [...state.jugadores].filter(j => !j.filial).sort(comparaPosicion); }
 function tareaVeces(t, jid){ return t.historial.filter(h => h.jugadorId === jid).length; }
@@ -3075,39 +3087,50 @@ function renderTareasCard(){
   if(!el) return;
   el.innerHTML = '<h3>Tareas del equipo</h3>' + TAREAS_DEF.map(def => {
     const t = tareaItem(def.id);
-    const j = t.jugadorId ? state.jugadores.find(x => x.id === t.jugadorId) : null;
+    const js = t.jugadorIds.map(id => state.jugadores.find(x => x.id === id)).filter(Boolean);
     return `
     <div class="tarea-row">
       <span class="tarea-ico">${def.icono}</span>
       <div class="tarea-main">
         <small>${def.nombre}</small>
-        ${j ? `<div class="tarea-who">${avatarHtml(j,'small')}<span>${escapeHtml(formatName(j.nombre))}</span></div>` : '<div class="tarea-who vacia">Sin asignar</div>'}
+        ${js.length ? `<div class="tarea-who">${js.length === 1 ? avatarHtml(js[0],'small') : ''}<span>${js.map(j => escapeHtml(formatName(j.nombre))).join(', ')}</span></div>` : '<div class="tarea-who vacia">Sin asignar</div>'}
       </div>
       <div class="tarea-actions">
-        ${j ? `<button type="button" class="btn-small" onclick="tareaHecha('${def.id}')">✓ Hecho</button>` : ''}
-        <button type="button" class="btn-ghost" onclick="abrirModalTarea('${def.id}')">${j ? 'Cambiar' : 'Asignar'}</button>
+        ${js.length ? `<button type="button" class="btn-small" onclick="tareaHecha('${def.id}')">✓ Hecho</button>` : ''}
+        <button type="button" class="btn-ghost" onclick="abrirModalTarea('${def.id}')">${js.length ? 'Cambiar' : 'Asignar'}</button>
       </div>
     </div>`;
   }).join('');
 }
+let tareaSel = [];
 function abrirModalTarea(id){
   const def = TAREAS_DEF.find(d => d.id === id);
+  tareaSel = [...tareaItem(id).jugadorIds];
+  openModal(`
+    <h3>${def.icono} ${def.nombre} — ¿quiénes?</h3>
+    <p class="hint">Puedes marcar a más de uno. Ordenados de quien menos veces lo ha hecho a quien más.</p>
+    <div id="tareaPicker"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="asignarTarea('${id}')">Guardar</button>
+    </div>`);
+  tareaPickerRender(id);
+}
+function tareaPickerRender(id){
   const t = tareaItem(id);
   const orden = tareaOrdenJugadores(t);
-  openModal(`
-    <h3>${def.icono} ${def.nombre} — ¿quién?</h3>
-    <p class="hint">Ordenados de quien menos veces lo ha hecho a quien más. Toca para asignar.</p>
-    ${orden.map((j, i) => `
-      <button type="button" class="tp-row ${t.jugadorId === j.id ? 'actual' : ''}" onclick="asignarTarea('${id}','${j.id}')">
-        ${avatarHtml(j,'small')}
-        <span class="tp-name">${escapeHtml(formatName(j.nombre))}</span>
-        ${i === 0 ? '<span class="badge sup">Le toca</span>' : ''}
-        <small>${tareaVeces(t,j.id)} ${tareaVeces(t,j.id)===1?'vez':'veces'}</small>
-      </button>`).join('')}
-    <div class="modal-actions">
-      ${t.jugadorId ? `<button class="btn-secondary" onclick="asignarTarea('${id}', null)">Quitar</button>` : ''}
-      <button class="btn-secondary" onclick="closeModal()">Cerrar</button>
-    </div>`);
+  const n = Math.max(1, t.jugadorIds.length);
+  document.getElementById('tareaPicker').innerHTML = orden.map((j, i) => `
+    <button type="button" class="tp-row ${tareaSel.includes(j.id) ? 'actual' : ''}" onclick="tareaToggle('${id}','${j.id}')">
+      ${avatarHtml(j,'small')}
+      <span class="tp-name">${tareaSel.includes(j.id) ? '✓ ' : ''}${escapeHtml(formatName(j.nombre))}</span>
+      ${i < n ? '<span class="badge sup">Le toca</span>' : ''}
+      <small>${tareaVeces(t,j.id)} ${tareaVeces(t,j.id)===1?'vez':'veces'}</small>
+    </button>`).join('');
+}
+function tareaToggle(id, jid){
+  tareaSel = tareaSel.includes(jid) ? tareaSel.filter(x => x !== jid) : [...tareaSel, jid];
+  tareaPickerRender(id);
 }
 async function guardarTarea(item){
   const idx = state.tareas.findIndex(x => x.id === item.id);
@@ -3115,25 +3138,100 @@ async function guardarTarea(item){
   renderTareasCard();
   await guardarColeccion(STORAGE_KEYS.tareas, {tipo:'upsert', item});
 }
-async function asignarTarea(id, jugadorId){
+async function asignarTarea(id){
   const t = tareaItem(id);
-  t.jugadorId = jugadorId || null;
-  t.fechaAsignacion = jugadorId ? todayISO() : '';
+  t.jugadorIds = [...tareaSel];
+  t.fechaAsignacion = t.jugadorIds.length ? todayISO() : '';
   closeModal();
   await guardarTarea(t);
 }
-/* Marca la tarea como hecha por quien la tenía y pasa automáticamente al siguiente que le toca. */
+/* Marca la tarea como hecha por quienes la tenían y pasa automáticamente a los siguientes que les toca (mismo número de personas). */
 async function tareaHecha(id){
   const def = TAREAS_DEF.find(d => d.id === id);
   const t = tareaItem(id);
-  if(!t.jugadorId){ abrirModalTarea(id); return; }
-  const actual = state.jugadores.find(x => x.id === t.jugadorId);
-  t.historial = [...t.historial, {jugadorId: t.jugadorId, fecha: todayISO()}].slice(-300);
-  const siguiente = tareaOrdenJugadores(t).find(j => j.id !== t.jugadorId) || null;
-  t.jugadorId = siguiente ? siguiente.id : null;
-  t.fechaAsignacion = siguiente ? todayISO() : '';
+  if(!t.jugadorIds.length){ abrirModalTarea(id); return; }
+  const actuales = t.jugadorIds.map(i => state.jugadores.find(x => x.id === i)).filter(Boolean);
+  const hoy = todayISO();
+  t.historial = [...t.historial, ...t.jugadorIds.map(jugadorId => ({jugadorId, fecha: hoy}))].slice(-400);
+  const n = t.jugadorIds.length;
+  const siguientes = tareaOrdenJugadores(t).filter(j => !t.jugadorIds.includes(j.id)).slice(0, n);
+  t.jugadorIds = siguientes.map(j => j.id);
+  t.fechaAsignacion = siguientes.length ? hoy : '';
   await guardarTarea(t);
-  showToast(`${def.nombre}: hecho${actual ? ' por ' + formatName(actual.nombre) : ''}.${siguiente ? ' Siguiente: ' + formatName(siguiente.nombre) : ''}`);
+  showToast(`${def.nombre}: hecho por ${actuales.map(j => formatName(j.nombre)).join(', ')}.${siguientes.length ? ' Siguiente: ' + siguientes.map(j => formatName(j.nombre)).join(', ') : ''}`);
+}
+
+/* ===================== PARTIDO: BALÓN PARADO (opciones según convocatoria y alineación) ===================== */
+function estadoJugadorPartido(p, jid){
+  const conv = p.convocatoria || {};
+  const hayConv = Object.values(conv).some(e => e && e.convocado);
+  if(!hayConv) return 'libre';
+  const e = conv[jid];
+  if(!e || !e.convocado) return 'no';
+  const once = new Set(Object.values(p.alineacion || {}));
+  return (once.has(jid) || e.condicion === 'titular') ? 'tit' : 'sup';
+}
+function abrirModalBPPartido(pid){
+  openModal('');
+  renderBPPartido(pid);
+}
+function renderBPPartido(pid){
+  const p = state.partidos.find(x => x.id === pid);
+  const cont = document.getElementById('modalContent');
+  if(!p || !cont) return;
+  const elecc = Array.isArray(p.bpElecciones) ? p.bpElecciones : (p.bpElecciones ? Object.values(p.bpElecciones) : []);
+  const hayConv = Object.values(p.convocatoria || {}).some(e => e && e.convocado);
+  const cab = `<h3>Balón parado · ${escapeHtml(p.rival || 'Partido')}</h3>`;
+  const cierre = `<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cerrar</button></div>`;
+  if(!state.balonParado.length){
+    cont.innerHTML = cab + '<p class="hint">Aún no tienes jugadas guardadas. Añádelas en Entrenamientos → Balón parado y asigna jugadores a sus números.</p>' + cierre;
+    return;
+  }
+  const ET = {tit:'T', sup:'S', libre:'', no:''};
+  const seccion = (tipo, titulo) => {
+    const jugadas = state.balonParado.filter(b => (b.tipo || 'ataque') === tipo);
+    if(!jugadas.length) return '';
+    return `<div class="res-sub">${titulo}</div>` + jugadas.map(b => {
+      const asig = bpAsigOrdenadas(b);
+      const filas = asig.map(a => {
+        const sel = elecc.find(e => e.playId === b.id && String(e.num) === a.num);
+        const estados = a.ids.map(id => estadoJugadorPartido(p, id));
+        const ningunoDisp = hayConv && estados.every(x => x === 'no');
+        return `<div class="bp-row">
+          <span class="bp-num">${escapeHtml(a.num)}</span>
+          <div class="bp-opts">
+            ${a.ids.map((id, k) => { const j = state.jugadores.find(x => x.id === id); const est = estados[k];
+              return `<button type="button" class="bp-opt ${est === 'no' ? 'no' : ''} ${sel && sel.jugadorId === id ? 'sel' : ''}" data-num="${escapeHtml(a.num)}" onclick="bpElegir('${pid}','${b.id}',this.dataset.num,'${id}')">${escapeHtml(formatName(j.nombre))}${ET[est] ? `<small>${ET[est]}</small>` : ''}</button>`; }).join('')}
+            ${ningunoDisp ? '<span class="muted small" style="align-self:center">⚠ Ninguno está convocado</span>' : ''}
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="bp-jug">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px">
+          <h4 style="margin:0">${escapeHtml(b.nombre)} <span class="muted small" style="text-transform:none;font-family:Inter,sans-serif">· ${LADO_LABEL[b.lado]||'Centro'}</span></h4>
+          <button type="button" class="btn-small" onclick="verBalonParado('${b.id}')">Ver</button>
+        </div>
+        ${filas || '<p class="hint" style="margin:6px 0 0">Esta jugada aún no tiene números con jugadores. Edítala en Entrenamientos.</p>'}
+      </div>`;
+    }).join('');
+  };
+  cont.innerHTML = cab + `
+    <p class="hint">Para cada número verás los jugadores que tienes asignados. <strong>T</strong> = titular, <strong>S</strong> = suplente, tachado = no convocado. Toca uno para elegirlo en este partido.</p>
+    ${hayConv ? '' : '<p class="hint" style="color:var(--red-dark)">Este partido no tiene convocatoria todavía, así que se muestran todos.</p>'}
+    ${seccion('ataque', 'Ataque')}${seccion('defensa', 'Defensa')}` + cierre;
+}
+async function bpElegir(pid, playId, num, jid){
+  const p = state.partidos.find(x => x.id === pid);
+  if(!p) return;
+  if(estadoJugadorPartido(p, jid) === 'no'){ showToast('No está convocado en este partido.'); return; }
+  let elecc = Array.isArray(p.bpElecciones) ? [...p.bpElecciones] : (p.bpElecciones ? Object.values(p.bpElecciones) : []);
+  const ya = elecc.find(e => e.playId === playId && String(e.num) === String(num));
+  elecc = elecc.filter(e => !(e.playId === playId && String(e.num) === String(num)));
+  if(!(ya && ya.jugadorId === jid)) elecc.push({playId, num: String(num), jugadorId: jid});
+  p.bpElecciones = elecc;
+  renderBPPartido(pid);
+  await guardarColeccion(STORAGE_KEYS.partidos, {tipo:'upsert', item: p});
+  if(document.getElementById('modalContent').querySelector('.bp-jug')) renderBPPartido(pid);
 }
 
 /* ===================== MULTAS ===================== */
@@ -3637,7 +3735,7 @@ async function previewArchivoBalonParado(e){
 function abrirModalBalonParado(id){
   const item = id ? state.balonParado.find(b => b.id === id) : null;
   bpArchivoPendiente = undefined; bpArchivoTipoPendiente = undefined;
-  bpAsig = item && item.asignaciones ? item.asignaciones.map(a => ({num:String(a.num), jugadorId:a.jugadorId})) : [];
+  bpAsig = item && item.asignaciones ? normalizarArray(item.asignaciones).map(a => ({num:String(a.num), jugadorIds:[...bpAsigIds(a)]})) : [];
   openModal(`
     <h3>${item ? 'Editar jugada' : 'Nueva jugada a balón parado'}</h3>
     <label>Nombre<input type="text" id="mBpNombre" placeholder="Ej: Córner cerrado" value="${item?escapeHtml(item.nombre):''}"></label>
@@ -3654,7 +3752,7 @@ function abrirModalBalonParado(id){
     </div>
     <div class="bp-jug" style="box-shadow:none;background:var(--bg)">
       <h4>Números de la jugada</h4>
-      <p class="hint" style="margin:0 0 8px">Pon el número que aparece en el dibujo y elige qué jugador es.</p>
+      <p class="hint" style="margin:0 0 8px">Pon el número que aparece en el dibujo y añade uno o varios jugadores que pueden ser ese número.</p>
       <div id="bpAsigList"></div>
       <button type="button" class="btn-secondary" style="width:100%" onclick="bpAsigAdd()">+ Añadir número</button>
     </div>
@@ -3669,32 +3767,39 @@ function abrirModalBalonParado(id){
   bpAsigRender();
 }
 let bpAsig = [];
+function bpAsigIds(a){ return Array.isArray(a.jugadorIds) ? a.jugadorIds : (a.jugadorIds ? Object.values(a.jugadorIds) : (a.jugadorId ? [a.jugadorId] : [])); }
 function bpAsigRender(){
   const el = document.getElementById('bpAsigList');
   if(!el) return;
   const jugs = [...state.jugadores].sort(comparaPosicion);
   el.innerHTML = bpAsig.map((a, i) => `
-    <div class="inline-form" style="flex-wrap:nowrap;margin-bottom:8px">
-      <input type="text" inputmode="numeric" style="width:56px;text-align:center;font-weight:700" value="${escapeHtml(a.num)}" oninput="bpAsig[${i}].num=this.value.trim()" placeholder="Nº">
-      <span class="muted">=</span>
-      <select style="flex:1;min-width:0;padding:9px;border:1px solid var(--border);border-radius:9px;font-size:14px;background:#fff" onchange="bpAsig[${i}].jugadorId=this.value">
-        <option value="">Elige jugador</option>
-        ${jugs.map(j => `<option value="${j.id}" ${a.jugadorId===j.id?'selected':''}>${escapeHtml(formatName(j.nombre))}</option>`).join('')}
-      </select>
-      <button type="button" class="icon-btn danger" onclick="bpAsigDel(${i})">🗑</button>
+    <div style="margin-bottom:12px">
+      <div class="inline-form" style="flex-wrap:nowrap;margin-bottom:6px">
+        <input type="text" inputmode="numeric" style="width:56px;text-align:center;font-weight:700" value="${escapeHtml(a.num)}" oninput="bpAsig[${i}].num=this.value.trim()" placeholder="Nº">
+        <select style="flex:1;min-width:0;padding:9px;border:1px solid var(--border);border-radius:9px;font-size:14px;background:#fff" onchange="bpAsigAddJug(${i}, this.value)">
+          <option value="">+ Añadir jugador…</option>
+          ${jugs.filter(j => !a.jugadorIds.includes(j.id)).map(j => `<option value="${j.id}">${escapeHtml(formatName(j.nombre))}</option>`).join('')}
+        </select>
+        <button type="button" class="icon-btn danger" onclick="bpAsigDel(${i})">🗑</button>
+      </div>
+      <div class="sor-chips" style="margin-top:0">
+        ${a.jugadorIds.map(id => { const j = state.jugadores.find(x => x.id === id); return j ? `<span class="sor-chip">${escapeHtml(formatName(j.nombre))}<button type="button" onclick="bpAsigQuitarJug(${i},'${id}')">×</button></span>` : ''; }).join('') || '<span class="muted small">Sin jugadores todavía</span>'}
+      </div>
     </div>`).join('');
 }
 function bpAsigAdd(){
   const nums = bpAsig.map(a => parseInt(a.num, 10)).filter(n => !isNaN(n));
-  bpAsig.push({num: String(nums.length ? Math.max(...nums) + 1 : 0), jugadorId: ''});
+  bpAsig.push({num: String(nums.length ? Math.max(...nums) + 1 : 0), jugadorIds: []});
   bpAsigRender();
 }
+function bpAsigAddJug(i, id){ if(id && !bpAsig[i].jugadorIds.includes(id)) bpAsig[i].jugadorIds.push(id); bpAsigRender(); }
+function bpAsigQuitarJug(i, id){ bpAsig[i].jugadorIds = bpAsig[i].jugadorIds.filter(x => x !== id); bpAsigRender(); }
 function bpAsigDel(i){ bpAsig.splice(i, 1); bpAsigRender(); }
 async function guardarBalonParado(id){
   const nombre = document.getElementById('mBpNombre').value.trim();
   const tipo = document.getElementById('mBpTipo').value;
   const lado = document.getElementById('mBpLado').value;
-  const asignaciones = bpAsig.filter(a => a.num !== '' && a.jugadorId).map(a => ({num: String(a.num), jugadorId: a.jugadorId}));
+  const asignaciones = bpAsig.filter(a => a.num !== '' && a.jugadorIds.length).map(a => ({num: String(a.num), jugadorIds: [...a.jugadorIds]}));
   if(!nombre){ showToast('Ponle un nombre a la jugada.'); return; }
   let itemFinal;
   if(id){
@@ -3720,10 +3825,10 @@ async function borrarBalonParado(id){
   showToast('Eliminada.');
 }
 function bpAsigOrdenadas(item){
-  return (item.asignaciones || []).map(a => {
-    const j = state.jugadores.find(x => x.id === a.jugadorId);
-    return j ? {num: String(a.num), nombre: formatName(j.nombre)} : null;
-  }).filter(Boolean).sort((a,b) => (parseFloat(a.num) - parseFloat(b.num)) || a.num.localeCompare(b.num));
+  return normalizarArray(item.asignaciones).map(a => {
+    const js = bpAsigIds(a).map(id => state.jugadores.find(x => x.id === id)).filter(Boolean);
+    return js.length ? {num: String(a.num), ids: js.map(j => j.id), nombre: js.map(j => formatName(j.nombre)).join(', ')} : null;
+  }).filter(Boolean).sort((x,y) => (parseFloat(x.num) - parseFloat(y.num)) || x.num.localeCompare(y.num));
 }
 function dataUrlToBlobUrl(d){
   const [h, b] = d.split(',');
