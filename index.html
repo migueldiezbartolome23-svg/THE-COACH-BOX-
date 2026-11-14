@@ -691,7 +691,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '14/11/2026 - 13:00 multas y tareas';
+const APP_VERSION = '14/11/2026 - 13:30 multas y tareas';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -3066,7 +3066,8 @@ async function generarConvocatoriaPDF(partidoId){
 const TAREAS_DEF = [
   {id:'barrer', icono:'🧹', nombre:'Barrer'},
   {id:'botellines', icono:'💧', nombre:'Rellenar botellines'},
-  {id:'material', icono:'🎒', nombre:'Llevar material'}
+  {id:'material', icono:'🎒', nombre:'Llevar material'},
+  {id:'estiramientos', icono:'🤸', nombre:'Estiramientos'}
 ];
 function tareaIds(t){ return Array.isArray(t.jugadorIds) ? t.jugadorIds : (t.jugadorIds ? Object.values(t.jugadorIds) : (t.jugadorId ? [t.jugadorId] : [])); }
 function tareaItem(id){
@@ -3183,28 +3184,29 @@ function renderBPPartido(pid){
   if(!p || !cont) return;
   const elecc = Array.isArray(p.bpElecciones) ? p.bpElecciones : (p.bpElecciones ? Object.values(p.bpElecciones) : []);
   const hayConv = Object.values(p.convocatoria || {}).some(e => e && e.convocado);
+  const haytit = state.jugadores.some(j => estadoJugadorPartido(p, j.id) === 'tit');
   const cab = `<h3>Balón parado · ${escapeHtml(p.rival || 'Partido')}</h3>`;
   const cierre = `<div class="modal-actions"><button class="btn-secondary" onclick="closeModal()">Cerrar</button></div>`;
   if(!state.balonParado.length){
     cont.innerHTML = cab + '<p class="hint">Aún no tienes jugadas guardadas. Añádelas en Entrenamientos → Balón parado y asigna jugadores a sus números.</p>' + cierre;
     return;
   }
-  const ET = {tit:'T', sup:'S', libre:'', no:''};
+  const ET = {tit:'', sup:'', libre:'', no:''};
   const seccion = (tipo, titulo) => {
     const jugadas = state.balonParado.filter(b => (b.tipo || 'ataque') === tipo);
     if(!jugadas.length) return '';
     return `<div class="res-sub">${titulo}</div>` + jugadas.map(b => {
-      const asig = bpAsigOrdenadas(b);
+      const asig = bpAsigOrdenadas(b).map(a => ({...a, ids: haytit ? a.ids.filter(id => estadoJugadorPartido(p, id) === 'tit') : a.ids}));
       const filas = asig.map(a => {
         const sel = elecc.find(e => e.playId === b.id && String(e.num) === a.num);
         const estados = a.ids.map(id => estadoJugadorPartido(p, id));
-        const ningunoDisp = hayConv && estados.every(x => x === 'no');
+        const ningunoDisp = a.ids.length === 0;
         return `<div class="bp-row">
           <span class="bp-num">${escapeHtml(a.num)}</span>
           <div class="bp-opts">
             ${a.ids.map((id, k) => { const j = state.jugadores.find(x => x.id === id); const est = estados[k];
               return `<button type="button" class="bp-opt ${est === 'no' ? 'no' : ''} ${sel && sel.jugadorId === id ? 'sel' : ''}" data-num="${escapeHtml(a.num)}" onclick="bpElegir('${pid}','${b.id}',this.dataset.num,'${id}')">${escapeHtml(formatName(j.nombre))}${ET[est] ? `<small>${ET[est]}</small>` : ''}</button>`; }).join('')}
-            ${ningunoDisp ? '<span class="muted small" style="align-self:center">⚠ Ninguno está convocado</span>' : ''}
+            ${ningunoDisp ? '<span class="muted small" style="align-self:center">⚠ Ningún titular para este número</span>' : ''}
           </div>
         </div>`;
       }).join('');
@@ -3218,14 +3220,15 @@ function renderBPPartido(pid){
     }).join('');
   };
   cont.innerHTML = cab + `
-    <p class="hint">Para cada número verás los jugadores que tienes asignados. <strong>T</strong> = titular, <strong>S</strong> = suplente, tachado = no convocado. Toca uno para elegirlo en este partido.</p>
-    ${hayConv ? '' : '<p class="hint" style="color:var(--red-dark)">Este partido no tiene convocatoria todavía, así que se muestran todos.</p>'}
+    ${haytit ? '<p class="hint">Solo aparecen los <strong>titulares</strong> (el once de la alineación o los marcados como titulares en la convocatoria). Toca uno para elegirlo en este partido.</p>'
+             : '<p class="hint" style="color:var(--red-dark)">Este partido aún no tiene titulares marcados, así que se muestran todos. Pon la alineación o marca los titulares en la convocatoria para que solo salgan ellos.</p>'}
     ${seccion('ataque', 'Ataque')}${seccion('defensa', 'Defensa')}` + cierre;
 }
 async function bpElegir(pid, playId, num, jid){
   const p = state.partidos.find(x => x.id === pid);
   if(!p) return;
   if(estadoJugadorPartido(p, jid) === 'no'){ showToast('No está convocado en este partido.'); return; }
+  if(state.jugadores.some(j => estadoJugadorPartido(p, j.id) === 'tit') && estadoJugadorPartido(p, jid) !== 'tit'){ showToast('Solo pueden ser titulares.'); return; }
   let elecc = Array.isArray(p.bpElecciones) ? [...p.bpElecciones] : (p.bpElecciones ? Object.values(p.bpElecciones) : []);
   const ya = elecc.find(e => e.playId === playId && String(e.num) === String(num));
   elecc = elecc.filter(e => !(e.playId === playId && String(e.num) === String(num)));
@@ -3480,15 +3483,119 @@ function textoPendientes(jugadorId, conDetalle){
   if(hayRecargo) L.push('Recargo: 0,50 € por cada semana sin pagar pasadas las 2 primeras.');
   return L.join('\n').trim();
 }
+function cargarImagen(src){
+  return new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; setTimeout(() => res(null), 3000); });
+}
+function rrect(ctx, x, y, w, h, r){
+  ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+}
+function ajustarTexto(ctx, t, maxW){
+  if(ctx.measureText(t).width <= maxW) return t;
+  while(t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+/* Tarjeta visual con los colores del club, para enviar por WhatsApp en vez de una captura o un texto. */
+async function imagenPendientes(jugadorId, conDetalle){
+  const filas = multasPorJugador().filter(r => r.pend.length && (!jugadorId || r.j.id === jugadorId)).sort((a,b) => b.pendiente - a.pendiente);
+  if(!filas.length) return null;
+  try{ await document.fonts.load('700 40px Oswald'); await document.fonts.load('600 40px Oswald'); await document.fonts.load('500 28px Inter'); await document.fonts.load('600 28px Inter'); }catch(e){}
+  const logo = await cargarImagen(typeof LOGO_BASE64 === 'string' ? LOGO_BASE64 : 'logo-mark.png');
+  const W = 1080, PAD = 44, HEAD = 250, GAP = 18;
+  const rowH = r => 104 + (conDetalle ? r.pend.length * 42 + 10 : 0);
+  const total = filas.reduce((s, r) => s + r.pendiente, 0);
+  const hayRecargo = filas.some(r => r.pend.some(m => calcularRecargo(m.fecha) > 0));
+  const mostrarTotal = filas.length > 1;
+  const H = HEAD + 34 + filas.reduce((s, r) => s + rowH(r) + GAP, 0) + (mostrarTotal ? 170 : 0) + (hayRecargo ? 40 : 0) + 110;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d');
+  const OS = 'Oswald, "Arial Narrow", sans-serif', IN = 'Inter, -apple-system, Helvetica, sans-serif';
+  c.fillStyle = '#F3F4F7'; c.fillRect(0, 0, W, H);
+  // cabecera
+  const g = c.createLinearGradient(0, 0, W, HEAD); g.addColorStop(0, '#0F1E3D'); g.addColorStop(1, '#17294D');
+  c.fillStyle = g; c.fillRect(0, 0, W, HEAD);
+  c.fillStyle = '#D22630'; c.fillRect(0, HEAD, W, 12);
+  if(logo){ c.save(); rrect(c, PAD, 58, 134, 134, 30); c.clip(); c.drawImage(logo, PAD, 58, 134, 134); c.restore(); c.lineWidth = 4; c.strokeStyle = 'rgba(255,255,255,.4)'; rrect(c, PAD, 58, 134, 134, 30); c.stroke(); }
+  const tx = logo ? PAD + 166 : PAD;
+  c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  c.fillStyle = '#fff'; c.font = `700 70px ${OS}`; c.fillText('MULTAS PENDIENTES', tx, 118);
+  c.fillStyle = 'rgba(255,255,255,.82)'; c.font = `500 31px ${IN}`; c.fillText('Cadete A · C.D. San Pedro', tx, 166);
+  c.fillStyle = '#F4B0B4'; c.font = `600 28px ${IN}`; c.fillText(formatDateLong(todayISO()), tx, 208);
+  // filas
+  let y = HEAD + 34 + 12;
+  filas.forEach(r => {
+    const h = rowH(r);
+    c.save(); c.shadowColor = 'rgba(15,30,61,.14)'; c.shadowBlur = 18; c.shadowOffsetY = 5;
+    c.fillStyle = '#fff'; rrect(c, PAD, y, W - PAD*2, h, 28); c.fill(); c.restore();
+    c.fillStyle = '#D22630'; rrect(c, PAD, y + 18, 12, h - 36, 6); c.fill();
+    c.fillStyle = '#0F1E3D'; c.beginPath(); c.arc(PAD + 82, y + 52, 32, 0, Math.PI*2); c.fill();
+    c.fillStyle = '#fff'; c.font = `700 30px ${OS}`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(String(r.j.dorsal), PAD + 82, y + 54);
+    c.textAlign = 'left';
+    const nx = PAD + 136, amtX = W - PAD - 34;
+    c.fillStyle = '#D22630'; c.font = `700 50px ${OS}`; c.textAlign = 'right'; c.fillText(money(r.pendiente), amtX, y + 54);
+    const amtW = c.measureText(money(r.pendiente)).width;
+    c.textAlign = 'left'; c.fillStyle = '#0F1E3D'; c.font = `600 44px ${OS}`;
+    const nombre = ajustarTexto(c, formatName(r.j.nombre).toUpperCase(), W - PAD*2 - 136 - amtW - 70);
+    c.fillText(nombre, nx, conDetalle ? y + 54 : y + 40);
+    if(!conDetalle){
+      c.fillStyle = '#707786'; c.font = `500 25px ${IN}`;
+      c.fillText(`${r.pend.length} multa${r.pend.length === 1 ? '' : 's'}`, nx, y + 80);
+    } else {
+      c.strokeStyle = '#E4E6EC'; c.lineWidth = 2; c.beginPath(); c.moveTo(PAD + 36, y + 96); c.lineTo(W - PAD - 36, y + 96); c.stroke();
+      r.pend.forEach((m, i) => {
+        const ly = y + 128 + i * 42, rec = calcularRecargo(m.fecha);
+        c.textBaseline = 'middle';
+        c.textAlign = 'right'; c.font = `600 26px ${IN}`; c.fillStyle = rec > 0 ? '#A81B24' : '#0F1E3D';
+        const imp = money(importeActual(m)); c.fillText(imp, amtX, ly);
+        const iw = c.measureText(imp).width;
+        c.textAlign = 'left'; c.font = `500 26px ${IN}`; c.fillStyle = '#4A5367';
+        c.fillText(ajustarTexto(c, `${formatDateShort(m.fecha)} · ${m.motivo}`, W - PAD*2 - 70 - iw - 40 - 20), nx - 36 + 36, ly);
+      });
+    }
+    c.textBaseline = 'alphabetic';
+    y += h + GAP;
+  });
+  // total
+  if(mostrarTotal){
+    const gr = c.createLinearGradient(PAD, y, W - PAD, y + 140); gr.addColorStop(0, '#D22630'); gr.addColorStop(1, '#A81B24');
+    c.save(); c.shadowColor = 'rgba(168,27,36,.35)'; c.shadowBlur = 22; c.shadowOffsetY = 6;
+    c.fillStyle = gr; rrect(c, PAD, y + 6, W - PAD*2, 140, 30); c.fill(); c.restore();
+    c.fillStyle = 'rgba(255,255,255,.9)'; c.font = `600 28px ${IN}`; c.textAlign = 'left'; c.textBaseline = 'middle';
+    c.fillText('TOTAL PENDIENTE', PAD + 44, y + 58);
+    c.font = `500 25px ${IN}`; c.fillStyle = 'rgba(255,255,255,.8)';
+    c.fillText(`${filas.length} jugadores`, PAD + 44, y + 100);
+    c.textAlign = 'right'; c.fillStyle = '#fff'; c.font = `700 78px ${OS}`; c.fillText(money(total), W - PAD - 44, y + 80);
+    c.textBaseline = 'alphabetic'; y += 170;
+  }
+  // pie
+  c.textAlign = 'center';
+  if(hayRecargo){ c.fillStyle = '#707786'; c.font = `500 23px ${IN}`; c.fillText('Recargo: 0,50 € por cada semana sin pagar pasadas las 2 primeras', W/2, y + 30); y += 40; }
+  c.fillStyle = '#0F1E3D'; c.globalAlpha = .55; c.font = `600 28px ${OS}`; c.fillText('CADETE A · C.D. SAN PEDRO', W/2, y + 62); c.globalAlpha = 1;
+  return cv;
+}
 async function compartirPendientes(jugadorId, conDetalle){
-  const texto = textoPendientes(jugadorId, conDetalle);
-  if(!texto){ showToast('No hay multas pendientes.'); return; }
-  if(navigator.share){
-    try{ await navigator.share({title:'Multas pendientes · Cadete A', text:texto}); return; }
+  if(!state.multas.some(m => !m.pagada && (!jugadorId || m.jugadorId === jugadorId))){ showToast('No hay multas pendientes.'); return; }
+  showToast('Preparando imagen…');
+  let blob = null;
+  try{ const cv = await imagenPendientes(jugadorId, conDetalle); if(cv) blob = await new Promise(r => cv.toBlob(r, 'image/png')); }
+  catch(e){ console.error('Error generando imagen', e); }
+  if(!blob){
+    const texto = textoPendientes(jugadorId, conDetalle);
+    if(navigator.share){ try{ await navigator.share({title:'Multas pendientes · Cadete A', text:texto}); return; }catch(e){ if(e && e.name === 'AbortError') return; } }
+    try{ await navigator.clipboard.writeText(texto); showToast('Texto copiado. Pégalo en el grupo.'); }catch(e){ prompt('Copia este texto:', texto); }
+    return;
+  }
+  const file = new File([blob], 'multas-pendientes.png', {type:'image/png'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:'Multas pendientes · Cadete A'}); return; }
     catch(e){ if(e && e.name === 'AbortError') return; }
   }
-  try{ await navigator.clipboard.writeText(texto); showToast('Texto copiado. Pégalo en el grupo.'); }
-  catch(e){ prompt('Copia este texto:', texto); }
+  const url = URL.createObjectURL(blob);
+  openModal(`
+    <h3>Multas pendientes</h3>
+    <p class="hint">Mantén pulsada la imagen para guardarla o compartirla.</p>
+    <img src="${url}" alt="Multas pendientes" style="width:100%;border-radius:12px;display:block">
+    <div class="modal-actions"><a class="btn-primary" style="text-decoration:none;display:inline-block" href="${url}" download="multas-pendientes.png">Descargar</a><button class="btn-secondary" onclick="closeModal()">Cerrar</button></div>`);
 }
 function renderMultasResumen(){
   const totalCobrado = state.multas.filter(m=>m.pagada).reduce((s,m)=> s + importeCobrado(m),0);
