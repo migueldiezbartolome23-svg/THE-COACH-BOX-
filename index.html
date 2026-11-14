@@ -18,7 +18,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
@@ -238,6 +237,22 @@ body.ficha-open{overflow:hidden;}
 .badge.sup{background:var(--red);color:#fff;}
 .badge.nc{background:#E4E6EC;color:var(--muted);}
 .badge.sd{background:#FFF4E5;color:#8A5A00;}
+.pm-leyenda{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;}
+.pm-row{padding:12px 0;border-bottom:1px solid var(--border);}
+.pm-row:last-child{border-bottom:none;}
+.pm-row.amistoso{opacity:.7;}
+.pm-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.pm-title{min-width:0;}
+.pm-title strong{display:block;font-size:13.5px;}
+.pm-title small{font-size:11px;color:var(--muted);}
+.pm-bar{height:10px;background:#E4E6EC;border-radius:6px;overflow:hidden;margin:8px 0 5px;}
+.pm-bar i{display:block;height:100%;border-radius:6px;}
+.pm-bar i.tit{background:var(--navy);}
+.pm-bar i.sup{background:var(--red);}
+.pm-bar i.sd{background:#E0A93B;}
+.pm-foot{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11.5px;color:var(--muted);}
+.pm-foot b{font-family:'Oswald',sans-serif;font-size:17px;color:var(--navy);font-weight:600;white-space:nowrap;}
+.pm-foot b em{font-style:normal;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:var(--muted);}
 .res-sub{font-family:'Oswald',sans-serif;font-size:13px;text-transform:uppercase;color:var(--navy);margin:18px 0 8px;letter-spacing:.03em;}
 .cambio-row{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:6px 6px 6px 10px;font-size:12.5px;margin-bottom:6px;}
 .cambio-row span{flex:1;}
@@ -306,6 +321,73 @@ body.ficha-open{overflow:hidden;}
 .sor-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .sor-actions .btn-small,.sor-actions .btn-secondary{padding:12px 6px;font-size:12.5px;text-align:center;}
 
+/* ---- Multas rediseñadas ---- */
+.mul-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:10px;}
+.mul-big{background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;justify-content:center;}
+.mul-big span{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;opacity:.9;}
+.mul-big b{font-family:'Oswald',sans-serif;font-size:32px;font-weight:600;line-height:1.15;}
+.mul-big small{font-size:11.5px;opacity:.92;}
+.mul-side{display:flex;flex-direction:column;gap:8px;}
+.mul-mini{background:var(--bg);border-radius:12px;padding:9px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;}
+.mul-mini span{font-size:10px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);}
+.mul-mini b{font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;color:var(--navy);}
+.mul-share{display:grid;grid-template-columns:1.5fr 1fr;gap:8px;margin-top:12px;}
+.mul-share button{padding:13px 8px;font-size:13.5px;}
+.mul-filtro{width:100%;margin-bottom:12px;background:#fff;}
+.mul-filtro .seg-btn{flex:1;padding:11px 6px;font-size:13px;}
+.mj-card{background:#fff;border-radius:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(15,30,61,.07);overflow:hidden;border-left:4px solid transparent;}
+.mj-card.debt{border-left-color:var(--red);}
+.mj-card.okc{border-left-color:#1E8E4E;}
+.mj-head{width:100%;display:flex;align-items:center;gap:10px;padding:12px;background:none;border:none;text-align:left;cursor:pointer;color:var(--text);}
+.mj-name{flex:1;min-width:0;}
+.mj-name strong{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mj-name small{font-size:11.5px;color:var(--muted);}
+.mj-amt{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;color:var(--red);white-space:nowrap;}
+.mj-amt.ok{color:#1E8E4E;}
+.mj-chev{color:var(--muted);font-size:13px;transition:transform .15s;}
+.mj-card.open .mj-chev{transform:rotate(90deg);}
+.mj-body{padding:0 12px 12px;border-top:1px solid var(--border);}
+.mj-fine{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;}
+.mj-fine-main strong{display:block;font-size:13px;font-weight:600;line-height:1.25;}
+.mj-fine-main small{font-size:11px;color:var(--muted);}
+.mj-fine-main small.late{color:var(--red-dark);font-weight:600;}
+.mj-fine-amt{font-family:'Oswald',sans-serif;font-size:16px;color:var(--navy);text-align:right;white-space:nowrap;}
+.mj-fine.paid .mj-fine-main strong{color:var(--muted);}
+.btn-cobrar{background:#1E8E4E;color:#fff;border:none;border-radius:9px;padding:9px 13px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;}
+.btn-undo{background:#EEF0F4;color:var(--text);border:none;border-radius:9px;padding:9px 11px;font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap;}
+.mj-actions{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-top:12px;}
+.mj-actions button{padding:11px 6px;font-size:12.5px;}
+details.card summary{cursor:pointer;font-family:'Oswald',sans-serif;text-transform:uppercase;color:var(--navy);font-size:14px;letter-spacing:.03em;display:flex;justify-content:space-between;align-items:center;gap:10px;list-style:none;}
+details.card summary::-webkit-details-marker{display:none;}
+details.card[open] summary{margin-bottom:12px;}
+details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
+
+/* ---- Tareas del equipo (página principal) ---- */
+.tarea-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--border);}
+.tarea-row:first-of-type{border-top:none;padding-top:2px;}
+.tarea-ico{font-size:24px;width:34px;text-align:center;flex-shrink:0;}
+.tarea-main{flex:1;min-width:0;}
+.tarea-main small{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);}
+.tarea-who{display:flex;align-items:center;gap:7px;font-weight:600;font-size:14.5px;color:var(--navy);margin-top:2px;}
+.tarea-who.vacia{color:var(--muted);font-weight:500;font-style:italic;}
+.tarea-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.tarea-actions button{padding:8px 12px;font-size:12px;}
+.tp-row{width:100%;display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border:2px solid transparent;border-radius:12px;margin-bottom:6px;cursor:pointer;text-align:left;font-size:14px;color:var(--text);}
+.tp-row.actual{border-color:var(--navy);}
+.tp-row .tp-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tp-row small{color:var(--muted);font-size:11.5px;white-space:nowrap;}
+
+/* ---- Visor de jugadas a balón parado ---- */
+.bp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.bp-jug{background:#fff;border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(15,30,61,.07);}
+.bp-jug h4{margin:0 0 8px;font-family:'Oswald',sans-serif;font-size:13px;text-transform:uppercase;color:var(--navy);letter-spacing:.03em;}
+.bp-jug-list{display:flex;flex-wrap:wrap;gap:6px;}
+.bp-jug-list span{background:var(--bg);border-radius:20px;padding:5px 11px;font-size:13px;font-weight:600;color:var(--navy);}
+.bp-zoom{overflow:auto;-webkit-overflow-scrolling:touch;border-radius:12px;background:#111;max-height:calc(100vh - 220px);}
+.bp-img{width:100%;height:auto;display:block;}
+.bp-zoom.zoomed .bp-img{width:260%;max-width:none;}
+.bp-pdf{width:100%;height:calc(100vh - 200px);border:none;border-radius:12px;background:#fff;}
+
 @media (min-width:700px){
   .bottom-nav{max-width:720px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 }
@@ -332,6 +414,8 @@ body.ficha-open{overflow:hidden;}
         <h2>Minutos</h2>
         <button class="btn-primary" onclick="abrirModalPartido()">+ Partido</button>
       </div>
+
+      <div class="card" id="tareasCard"></div>
 
       <div class="conv-toolbar">
         <button type="button" class="btn-ghost" id="viewListBtn" onclick="setMinutosView('lista')">Lista</button>
@@ -387,53 +471,37 @@ body.ficha-open{overflow:hidden;}
         <div class="fichas-grid" id="fichasGrid"></div>
       </div>
 
-      <div class="card" id="chartsCard" style="display:none">
-        <h3>Minutos por jugador</h3>
-        <canvas id="chartMinutos" height="230"></canvas>
-      </div>
-      <div class="card" id="chartsCard2" style="display:none">
-        <h3>Titular · Suplente · No convocado</h3>
-        <canvas id="chartEstados" height="230"></canvas>
-      </div>
-      <div class="card" id="chartsCard3" style="display:none">
-        <h3>Evolución por partido</h3>
-        <label style="margin-bottom:10px">Jugador
-          <select id="evolucionSelect" onchange="renderEvolucionChart()"></select>
-        </label>
-        <canvas id="chartEvolucion" height="230"></canvas>
-      </div>
     </section>
 
     <!-- TAB MULTAS -->
     <section id="tab-multas" class="tab-panel">
-      <div class="section-header"><h2>Multas</h2></div>
+      <div class="section-header"><h2>Multas</h2><button class="btn-primary" onclick="abrirModalMulta()">+ Multa</button></div>
 
       <div id="multasAlert" class="alert-banner" style="display:none"></div>
 
       <div class="card">
-        <h3>Nueva multa</h3>
-        <label>Jugador<select id="multaJugador"></select></label>
-        <label>Motivo<select id="multaMotivo" onchange="actualizarImporteSugerido()"></select></label>
-        <div class="form-grid">
-          <label>Importe (€)<input type="number" id="multaImporte" step="0.5" min="0"></label>
-          <label>Fecha<input type="date" id="multaFecha"></label>
+        <div class="mul-hero">
+          <div class="mul-big"><span>Pendiente de cobrar</span><b id="totalPendiente">0,00 €</b><small id="pendienteSub"></small></div>
+          <div class="mul-side">
+            <div class="mul-mini"><span>Recaudado</span><b id="totalCobrado">0,00 €</b></div>
+            <div class="mul-mini"><span>Fondo total</span><b id="totalFondo">0,00 €</b></div>
+          </div>
         </div>
-        <button class="btn-primary" onclick="registrarMulta()" style="width:100%">Añadir multa</button>
-      </div>
-
-      <div class="card">
-        <div class="totales-grid">
-          <div class="total-box"><span class="total-label">Recaudado</span><span class="total-value" id="totalCobrado">0,00 €</span></div>
-          <div class="total-box"><span class="total-label">Pendiente</span><span class="total-value" id="totalPendiente">0,00 €</span></div>
-        </div>
-        <div class="totales-grid" style="margin-top:10px">
-          <div class="total-box"><span class="total-label">Otros ingresos</span><span class="total-value" id="totalIngresos">0,00 €</span></div>
-          <div class="total-box"><span class="total-label">Fondo total</span><span class="total-value" id="totalFondo">0,00 €</span></div>
+        <div class="mul-share">
+          <button type="button" class="btn-primary" onclick="compartirPendientes(null,false)">📤 Compartir pendientes</button>
+          <button type="button" class="btn-secondary" onclick="compartirPendientes(null,true)">Con detalle</button>
         </div>
       </div>
 
-      <div class="card">
-        <h3>Otros ingresos</h3>
+      <div class="segmented mul-filtro" id="multasFiltro">
+        <button type="button" class="seg-btn" data-f="pendientes" onclick="setMultasFiltro('pendientes')">Pendientes</button>
+        <button type="button" class="seg-btn" data-f="pagadas" onclick="setMultasFiltro('pagadas')">Pagadas</button>
+        <button type="button" class="seg-btn" data-f="todas" onclick="setMultasFiltro('todas')">Todas</button>
+      </div>
+      <div id="multasLista"></div>
+
+      <details class="card" id="ingresosCard">
+        <summary><span>Otros ingresos</span><b id="totalIngresos">0,00 €</b></summary>
         <p class="hint">Aportaciones del club, sobrante de la temporada anterior, etc. Se suman al fondo total pero no son multas de ningún jugador.</p>
         <label>Concepto<input type="text" id="ingresoConcepto" placeholder="Ej: Aportación del club"></label>
         <div class="form-grid">
@@ -442,27 +510,7 @@ body.ficha-open{overflow:hidden;}
         </div>
         <button class="btn-primary" style="width:100%" onclick="registrarIngreso()">Añadir ingreso</button>
         <div id="ingresosList" class="list-simple" style="margin-top:10px"></div>
-      </div>
-
-      <div class="card">
-        <h3>Por jugador</h3>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Jugador</th><th>Total</th><th>Pagado</th><th>Pendiente</th></tr></thead>
-            <tbody id="multasResumenBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>Historial</h3>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Fecha</th><th>Jugador</th><th>Motivo</th><th>Importe</th><th>✓</th><th></th></tr></thead>
-            <tbody id="multasLogBody"></tbody>
-          </table>
-        </div>
-      </div>
+      </details>
     </section>
 
     <!-- TAB JUGADORES -->
@@ -611,6 +659,14 @@ body.ficha-open{overflow:hidden;}
   </div>
   <div class="ficha-body" id="sorteoBody"></div>
 </div>
+<div id="bpPage" class="ficha-page hidden">
+  <div class="ficha-top">
+    <button type="button" class="ficha-back" onclick="cerrarBpVisor()">← Volver</button>
+    <strong id="bpTitulo">Jugada</strong>
+    <div class="crest" style="margin-left:auto"><img src="logo-mark.png" alt=""></div>
+  </div>
+  <div class="ficha-body" id="bpBody"></div>
+</div>
 <div id="fichaPage" class="ficha-page hidden">
   <div class="ficha-top">
     <button type="button" class="ficha-back" onclick="cerrarFicha()">← Volver</button>
@@ -626,7 +682,7 @@ body.ficha-open{overflow:hidden;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '12/11/2026 - 14:20 logos';
+const APP_VERSION = '13/11/2026 - 20:05 multas y tareas';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -643,7 +699,7 @@ try{
   firebase.initializeApp(FIREBASE_CONFIG);
   fbDb = firebase.database();
 }catch(e){ console.error('Error inicializando Firebase', e); }
-const STORAGE_KEYS = { jugadores:'jugadores', entrenadores:'entrenadores', config:'config', partidos:'partidos', multas:'multas', catalogo:'catalogo_multas', ejercicios:'ejercicios', tests:'tests_fisicos', ingresos:'ingresos', balonParado:'balon_parado' };
+const STORAGE_KEYS = { jugadores:'jugadores', entrenadores:'entrenadores', config:'config', partidos:'partidos', multas:'multas', catalogo:'catalogo_multas', ejercicios:'ejercicios', tests:'tests_fisicos', ingresos:'ingresos', balonParado:'balon_parado', tareas:'tareas' };
 
 const CATALOGO_DEFAULT = [
   ['Retraso injustificado en entrenamiento',1.00],
@@ -769,8 +825,7 @@ const FORMACIONES_POSICIONES = {
   ]
 };
 
-let state = { jugadores:[], entrenadores:[], config:{...CONFIG_DEFAULT}, partidos:[], multas:[], catalogo:[], ejercicios:[], tests:[], ingresos:[], balonParado:[] };
-let charts = { minutos:null, estados:null, evolucion:null, ficha:null };
+let state = { jugadores:[], entrenadores:[], config:{...CONFIG_DEFAULT}, partidos:[], multas:[], catalogo:[], ejercicios:[], tests:[], ingresos:[], balonParado:[], tareas:[] };
 let currentSort = { key:'minutos', dir:'desc' };
 let minutosView = 'calendario';
 let calFecha = new Date();
@@ -845,6 +900,7 @@ function getArrayForKey(key){
   if(key === STORAGE_KEYS.tests) return state.tests;
   if(key === STORAGE_KEYS.ingresos) return state.ingresos;
   if(key === STORAGE_KEYS.balonParado) return state.balonParado;
+  if(key === STORAGE_KEYS.tareas) return state.tareas;
   return [];
 }
 function setArrayForKey(key, arr){
@@ -857,6 +913,7 @@ function setArrayForKey(key, arr){
   else if(key === STORAGE_KEYS.tests){ state.tests = arr; renderEntrenamientosTab(); }
   else if(key === STORAGE_KEYS.ingresos){ state.ingresos = arr; renderMultasTab(); }
   else if(key === STORAGE_KEYS.balonParado){ state.balonParado = arr; renderEntrenamientosTab(); }
+  else if(key === STORAGE_KEYS.tareas){ state.tareas = arr; renderTareasCard(); }
 }
 
 function migrarConvocatoria(partidos){
@@ -876,7 +933,7 @@ function migrarConvocatoria(partidos){
 }
 
 async function init(){
-  const [jugadoresLocal, entrenadoresLocal, rosterViejoLocal, configLocal, partidosLocal, multasLocal, catalogoLocal, ejerciciosLocal, testsLocal, ingresosLocal, balonParadoLocal] = await Promise.all([
+  const [jugadoresLocal, entrenadoresLocal, rosterViejoLocal, configLocal, partidosLocal, multasLocal, catalogoLocal, ejerciciosLocal, testsLocal, ingresosLocal, balonParadoLocal, tareasLocal] = await Promise.all([
     loadKey(STORAGE_KEYS.jugadores, null),
     loadKey(STORAGE_KEYS.entrenadores, null),
     loadKey('roster', null),
@@ -887,7 +944,8 @@ async function init(){
     loadKey(STORAGE_KEYS.ejercicios, []),
     loadKey(STORAGE_KEYS.tests, []),
     loadKey(STORAGE_KEYS.ingresos, []),
-    loadKey(STORAGE_KEYS.balonParado, [])
+    loadKey(STORAGE_KEYS.balonParado, []),
+    loadKey(STORAGE_KEYS.tareas, [])
   ]);
 
   // CLAVE: comprobamos primero qué hay YA en Firebase antes de decidir nada. Si una sesión
@@ -954,6 +1012,8 @@ async function init(){
   state.tests = hay(STORAGE_KEYS.tests) ? normalizarArray(remoto[STORAGE_KEYS.tests]) : (testsLocal || []);
   state.ingresos = hay(STORAGE_KEYS.ingresos) ? normalizarArray(remoto[STORAGE_KEYS.ingresos]) : (ingresosLocal || []);
   state.balonParado = hay(STORAGE_KEYS.balonParado) ? normalizarArray(remoto[STORAGE_KEYS.balonParado]) : (balonParadoLocal || []);
+  state.tareas = hay(STORAGE_KEYS.tareas) ? normalizarArray(remoto[STORAGE_KEYS.tareas]) : (tareasLocal || []);
+  await saveKey(STORAGE_KEYS.tareas, state.tareas);
   await saveKey(STORAGE_KEYS.multas, state.multas);
   await saveKey(STORAGE_KEYS.ejercicios, state.ejercicios);
   await saveKey(STORAGE_KEYS.tests, state.tests);
@@ -985,6 +1045,7 @@ function aplicarDatosRemotos(remoto){
   if(remoto[STORAGE_KEYS.tests]) state.tests = normalizarArray(remoto[STORAGE_KEYS.tests]);
   if(remoto[STORAGE_KEYS.ingresos]) state.ingresos = normalizarArray(remoto[STORAGE_KEYS.ingresos]);
   if(remoto[STORAGE_KEYS.balonParado]) state.balonParado = normalizarArray(remoto[STORAGE_KEYS.balonParado]);
+  if(remoto[STORAGE_KEYS.tareas]) state.tareas = normalizarArray(remoto[STORAGE_KEYS.tareas]);
 }
 
 function activarSincronizacionEnVivo(){
@@ -1031,6 +1092,10 @@ function activarSincronizacionEnVivo(){
   fbDb.ref(STORAGE_KEYS.balonParado).on('value', snap => {
     state.balonParado = snap.val() ? normalizarArray(snap.val()) : [];
     renderEntrenamientosTab();
+  });
+  fbDb.ref(STORAGE_KEYS.tareas).on('value', snap => {
+    state.tareas = snap.val() ? normalizarArray(snap.val()) : [];
+    renderTareasCard();
   });
 
   document.addEventListener('visibilitychange', () => {
@@ -1087,6 +1152,7 @@ function renderAll(){
   renderAjustesTab();
   renderEntrenamientosTab();
   renderCapitanesCard();
+  renderTareasCard();
 }
 
 /* ===================== UTILIDADES ===================== */
@@ -1400,15 +1466,14 @@ function renderMinutosTab(){
   const listEl = document.getElementById('partidosList');
   const emptyEl = document.getElementById('minutosEmpty');
   const statsCard = document.getElementById('statsCard');
-  const c1 = document.getElementById('chartsCard'), c2 = document.getElementById('chartsCard2'), c3 = document.getElementById('chartsCard3');
 
   if(state.partidos.length === 0){
     listEl.innerHTML = '';
     if(minutosView==='lista') emptyEl.style.display = 'block';
-    statsCard.style.display = 'none'; c1.style.display='none'; c2.style.display='none'; c3.style.display='none';
+    statsCard.style.display = 'none';
   } else {
     emptyEl.style.display = 'none';
-    statsCard.style.display = 'block'; c1.style.display='block'; c2.style.display='block'; c3.style.display='block';
+    statsCard.style.display = 'block';
 
     const sorted = [...state.partidos].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
     listEl.innerHTML = sorted.map(p => {
@@ -1435,10 +1500,10 @@ function renderMinutosTab(){
       </div>`;
     }).join('');
     renderStatsTable();
-    renderCharts();
   }
   if(minutosView==='calendario') renderCalendario();
   renderFichasGrid();
+  renderTareasCard();
   if(window.__fichaId && fichaAbierta()) renderFicha();
 }
 
@@ -1890,48 +1955,6 @@ function renderStatsTable(){
     </tr>`).join('');
 }
 
-function renderCharts(){
-  const stats = computeStats().sort((a,b) => b.minutos - a.minutos);
-  const labels = stats.map(s => formatName(s.jugador.nombre));
-
-  if(charts.minutos) charts.minutos.destroy();
-  charts.minutos = new Chart(document.getElementById('chartMinutos'), {
-    type:'bar',
-    data:{labels, datasets:[{label:'Minutos totales', data:stats.map(s=>s.minutos), backgroundColor:'#0F1E3D', borderRadius:4}]},
-    options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{autoSkip:false, maxRotation:60, minRotation:45, font:{size:10}}}}}
-  });
-
-  if(charts.estados) charts.estados.destroy();
-  charts.estados = new Chart(document.getElementById('chartEstados'), {
-    type:'bar',
-    data:{labels, datasets:[
-      {label:'Titular', data:stats.map(s=>s.titular), backgroundColor:'#0F1E3D'},
-      {label:'Suplente', data:stats.map(s=>s.suplente), backgroundColor:'#D22630'},
-      {label:'No convocado', data:stats.map(s=>s.noConvocado), backgroundColor:'#C9CDD6'}
-    ]},
-    options:{responsive:true, scales:{x:{stacked:true, ticks:{font:{size:10}}}, y:{stacked:true}}}
-  });
-
-  const sel = document.getElementById('evolucionSelect');
-  const prevVal = sel.value;
-  sel.innerHTML = [...state.jugadores].sort(comparaPosicion).map(j => `<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`).join('');
-  if(prevVal && state.jugadores.find(j=>j.id===prevVal)) sel.value = prevVal;
-  renderEvolucionChart();
-}
-function renderEvolucionChart(){
-  const sel = document.getElementById('evolucionSelect');
-  const jugadorId = sel.value;
-  const partidosOrdenados = partidosParaEstadisticas().sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-  const labels = partidosOrdenados.map(p => `${formatDateShort(p.fecha)} ${p.rival?('vs '+p.rival):''}`);
-  const data = partidosOrdenados.map(p => { const e=(p.convocatoria||{})[jugadorId]; return e?(Number(e.minutos)||0):0; });
-  if(charts.evolucion) charts.evolucion.destroy();
-  charts.evolucion = new Chart(document.getElementById('chartEvolucion'), {
-    type:'line',
-    data:{labels, datasets:[{label:'Minutos', data, borderColor:'#D22630', backgroundColor:'rgba(210,38,48,0.15)', fill:true, tension:0.25, pointRadius:3}]},
-    options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{font:{size:9}}}}}
-  });
-}
-
 function pdfListaDosColumnas(doc, items, startY, opts={}){
   const xLeft = opts.xLeft ?? 20, xRight = opts.xRight ?? 112, lineHeight = opts.lineHeight ?? 7.5, maxY = opts.maxY ?? 280;
   let y = startY;
@@ -2071,12 +2094,50 @@ function cerrarFicha(){
 function ocultarFicha(){
   document.getElementById('fichaPage').classList.add('hidden');
   document.body.classList.remove('ficha-open');
-  if(charts.ficha){ charts.ficha.destroy(); charts.ficha = null; }
 }
 window.addEventListener('hashchange', () => {
   if(location.hash !== '#ficha' && fichaAbierta()) ocultarFicha();
   if(location.hash !== '#sorteo' && sorteoAbierto()) ocultarSorteo();
+  if(location.hash !== '#jugada' && bpVisorAbierto()) ocultarBpVisor();
 });
+
+/* Sección "Partido a partido" de la ficha: una fila por partido ya jugado, con el estado
+   (titular / suplente / no convocado) y una barra con los minutos jugados sobre la duración. */
+function partidoAPartidoHtml(todos, hoy){
+  const jugados = todos.filter(r => r.p.fecha <= hoy || partidoJugado(r.p) || r.min > 0);
+  const pendientes = todos.length - jugados.length;
+  const leyenda = `
+    <div class="pm-leyenda"><span class="badge tit">Titular</span><span class="badge sup">Suplente</span><span class="badge nc">No convocado</span></div>
+    <p class="hint" style="margin:0 0 4px">La barra muestra los minutos jugados sobre la duración del partido. Del más reciente al más antiguo.</p>`;
+  if(!jugados.length) return leyenda + '<p class="hint">Todavía no hay partidos jugados.</p>';
+  const filas = [...jugados].reverse().map(r => {
+    const dur = Number(r.p.duracion) || 0;
+    const clase = !r.conv ? 'nc' : (r.cond === 'titular' ? 'tit' : (r.cond === 'suplente' ? 'sup' : 'sd'));
+    const estado = !r.conv ? 'No convocado' : (r.cond === 'titular' ? 'Titular' : (r.cond === 'suplente' ? 'Suplente' : 'Convocado'));
+    const sub = [formatDateShort(r.p.fecha)];
+    if(r.p.local === true) sub.push('Local'); else if(r.p.local === false) sub.push('Visitante');
+    if(r.p.resultado) sub.push('Resultado ' + r.p.resultado);
+    if(!r.cuenta) sub.push('Amistoso (no cuenta)');
+    const pct = (r.conv && dur > 0) ? Math.max(0, Math.min(100, r.min / dur * 100)) : 0;
+    const cambios = [];
+    if(r.conv && r.cond === 'suplente' && r.entra != null) cambios.push(`Entra al min ${r.entra}`);
+    if(r.conv && r.sale != null) cambios.push(`Sale al min ${r.sale}`);
+    const pie = r.conv
+      ? `<div class="pm-bar"><i class="${clase}" style="width:${pct}%"></i></div>
+         <div class="pm-foot"><span>${escapeHtml(cambios.join(' · ') || (r.min === 0 ? 'Sin minutos anotados' : ''))}</span><b>${r.min}'<em> de ${dur}'</em></b></div>`
+      : `<div class="pm-foot"><span>No entró en la convocatoria</span><b>–</b></div>`;
+    return `
+    <div class="pm-row${r.cuenta ? '' : ' amistoso'}">
+      <div class="pm-head">
+        <div class="pm-title"><strong>${r.p.jornada ? 'J' + r.p.jornada + ' · ' : ''}${escapeHtml(r.p.rival || 'Partido')}</strong><small>${escapeHtml(sub.join(' · '))}</small></div>
+        <span class="badge ${clase}">${estado}</span>
+      </div>
+      ${pie}
+    </div>`;
+  }).join('');
+  const nota = pendientes > 0 ? `<p class="hint" style="margin:10px 0 0">Quedan ${pendientes} partido${pendientes > 1 ? 's' : ''} por jugar.</p>` : '';
+  return leyenda + filas + nota;
+}
 
 function renderFicha(){
   const j = state.jugadores.find(x => x.id === window.__fichaId);
@@ -2095,22 +2156,7 @@ function renderFicha(){
     return {p, e, conv, min: conv ? (Number(e.minutos)||0) : 0, cond: conv ? e.condicion : null, entra, sale, cuenta: p.competicion !== 'Amistoso'};
   });
 
-  const badge = r => !r.conv ? '<span class="badge nc">No conv.</span>' : (r.cond === 'titular' ? '<span class="badge tit">Titular</span>' : (r.cond === 'suplente' ? '<span class="badge sup">Suplente</span>' : '<span class="badge sd">Sin decidir</span>'));
-  const detalle = r => {
-    const partes = [];
-    if(r.conv && r.cond === 'suplente' && r.entra != null) partes.push(`Entra min ${r.entra}'`);
-    if(r.conv && r.sale != null) partes.push(`Sale min ${r.sale}'`);
-    if(r.p.resultado) partes.push(r.p.resultado);
-    if(!r.cuenta) partes.push('Amistoso');
-    return partes.join(' · ');
-  };
-  const partidosHtml = todos.length ? [...todos].reverse().map(r => `
-    <div class="pj-row">
-      <span class="pj-date">${formatDateShort(r.p.fecha)}</span>
-      <div class="pj-main"><strong>${r.p.jornada ? 'J' + r.p.jornada + ' · ' : ''}${escapeHtml(r.p.rival || 'Partido')}</strong><small>${escapeHtml(detalle(r))}</small></div>
-      ${badge(r)}
-      <span class="pj-min">${r.conv ? r.min + "'" : '–'}</span>
-    </div>`).join('') : '<p class="hint">Todavía no hay partidos.</p>';
+  const partidosHtml = partidoAPartidoHtml(todos, todayISO());
 
   let multasHtml = '';
   if(!j.filial){
@@ -2167,10 +2213,6 @@ function renderFicha(){
       <p class="hint" style="margin:10px 0 0">Los amistosos no cuentan en estas cifras.</p>
     </div>
     <div class="card">
-      <h3>Minutos por partido</h3>
-      <canvas id="chartFicha" height="200"></canvas>
-    </div>
-    <div class="card">
       <h3>Partido a partido</h3>
       ${partidosHtml}
     </div>
@@ -2178,17 +2220,6 @@ function renderFicha(){
     ${testsHtml}`;
   document.getElementById('fichaTitulo').textContent = formatName(j.nombre);
 
-  if(charts.ficha) charts.ficha.destroy();
-  const contables = todos.filter(r => r.cuenta);
-  charts.ficha = new Chart(document.getElementById('chartFicha'), {
-    type:'bar',
-    data:{
-      labels: contables.map(r => `${formatDateShort(r.p.fecha)} ${r.p.rival ? 'vs ' + r.p.rival : ''}`),
-      datasets:[{label:'Minutos', data: contables.map(r => r.min), borderRadius:4,
-        backgroundColor: contables.map(r => !r.conv ? '#C9CDD6' : (r.cond === 'titular' ? '#0F1E3D' : '#D22630'))}]
-    },
-    options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{font:{size:9}, autoSkip:false, maxRotation:60, minRotation:45}}, y:{beginAtZero:true}}}
-  });
 }
 
 /* ===================== VOTACIÓN DE CAPITANES ===================== */
@@ -3019,31 +3050,131 @@ async function generarConvocatoriaPDF(partidoId){
   }
 }
 
+/* ===================== TAREAS DEL EQUIPO (barrer, botellines, material) ===================== */
+const TAREAS_DEF = [
+  {id:'barrer', icono:'🧹', nombre:'Barrer'},
+  {id:'botellines', icono:'💧', nombre:'Rellenar botellines'},
+  {id:'material', icono:'🎒', nombre:'Llevar material'}
+];
+function tareaItem(id){
+  const t = state.tareas.find(x => x.id === id);
+  return t ? {...t, historial: t.historial || []} : {id, jugadorId:null, fechaAsignacion:'', historial:[]};
+}
+function jugadoresTareas(){ return [...state.jugadores].filter(j => !j.filial).sort(comparaPosicion); }
+function tareaVeces(t, jid){ return t.historial.filter(h => h.jugadorId === jid).length; }
+function tareaUltima(t, jid){ const f = t.historial.filter(h => h.jugadorId === jid).map(h => h.fecha).sort(); return f.length ? f[f.length-1] : ''; }
+/* Orden de "a quién le toca": primero quien menos veces lo ha hecho; a igualdad, quien lleva más tiempo sin hacerlo. */
+function tareaOrdenJugadores(t){
+  return jugadoresTareas().sort((a,b) =>
+    (tareaVeces(t,a.id) - tareaVeces(t,b.id)) ||
+    tareaUltima(t,a.id).localeCompare(tareaUltima(t,b.id)) ||
+    (a.dorsal - b.dorsal));
+}
+function renderTareasCard(){
+  const el = document.getElementById('tareasCard');
+  if(!el) return;
+  el.innerHTML = '<h3>Tareas del equipo</h3>' + TAREAS_DEF.map(def => {
+    const t = tareaItem(def.id);
+    const j = t.jugadorId ? state.jugadores.find(x => x.id === t.jugadorId) : null;
+    return `
+    <div class="tarea-row">
+      <span class="tarea-ico">${def.icono}</span>
+      <div class="tarea-main">
+        <small>${def.nombre}</small>
+        ${j ? `<div class="tarea-who">${avatarHtml(j,'small')}<span>${escapeHtml(formatName(j.nombre))}</span></div>` : '<div class="tarea-who vacia">Sin asignar</div>'}
+      </div>
+      <div class="tarea-actions">
+        ${j ? `<button type="button" class="btn-small" onclick="tareaHecha('${def.id}')">✓ Hecho</button>` : ''}
+        <button type="button" class="btn-ghost" onclick="abrirModalTarea('${def.id}')">${j ? 'Cambiar' : 'Asignar'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function abrirModalTarea(id){
+  const def = TAREAS_DEF.find(d => d.id === id);
+  const t = tareaItem(id);
+  const orden = tareaOrdenJugadores(t);
+  openModal(`
+    <h3>${def.icono} ${def.nombre} — ¿quién?</h3>
+    <p class="hint">Ordenados de quien menos veces lo ha hecho a quien más. Toca para asignar.</p>
+    ${orden.map((j, i) => `
+      <button type="button" class="tp-row ${t.jugadorId === j.id ? 'actual' : ''}" onclick="asignarTarea('${id}','${j.id}')">
+        ${avatarHtml(j,'small')}
+        <span class="tp-name">${escapeHtml(formatName(j.nombre))}</span>
+        ${i === 0 ? '<span class="badge sup">Le toca</span>' : ''}
+        <small>${tareaVeces(t,j.id)} ${tareaVeces(t,j.id)===1?'vez':'veces'}</small>
+      </button>`).join('')}
+    <div class="modal-actions">
+      ${t.jugadorId ? `<button class="btn-secondary" onclick="asignarTarea('${id}', null)">Quitar</button>` : ''}
+      <button class="btn-secondary" onclick="closeModal()">Cerrar</button>
+    </div>`);
+}
+async function guardarTarea(item){
+  const idx = state.tareas.findIndex(x => x.id === item.id);
+  if(idx >= 0) state.tareas[idx] = item; else state.tareas.push(item);
+  renderTareasCard();
+  await guardarColeccion(STORAGE_KEYS.tareas, {tipo:'upsert', item});
+}
+async function asignarTarea(id, jugadorId){
+  const t = tareaItem(id);
+  t.jugadorId = jugadorId || null;
+  t.fechaAsignacion = jugadorId ? todayISO() : '';
+  closeModal();
+  await guardarTarea(t);
+}
+/* Marca la tarea como hecha por quien la tenía y pasa automáticamente al siguiente que le toca. */
+async function tareaHecha(id){
+  const def = TAREAS_DEF.find(d => d.id === id);
+  const t = tareaItem(id);
+  if(!t.jugadorId){ abrirModalTarea(id); return; }
+  const actual = state.jugadores.find(x => x.id === t.jugadorId);
+  t.historial = [...t.historial, {jugadorId: t.jugadorId, fecha: todayISO()}].slice(-300);
+  const siguiente = tareaOrdenJugadores(t).find(j => j.id !== t.jugadorId) || null;
+  t.jugadorId = siguiente ? siguiente.id : null;
+  t.fechaAsignacion = siguiente ? todayISO() : '';
+  await guardarTarea(t);
+  showToast(`${def.nombre}: hecho${actual ? ' por ' + formatName(actual.nombre) : ''}.${siguiente ? ' Siguiente: ' + formatName(siguiente.nombre) : ''}`);
+}
+
 /* ===================== MULTAS ===================== */
 function renderMultasTab(){
-  const selJ = document.getElementById('multaJugador');
-  const prevJ = selJ.value;
-  selJ.innerHTML = [...state.jugadores].filter(j => !j.filial).sort(comparaPosicion).map(j => `<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`).join('');
-  if(prevJ && state.jugadores.find(j=>j.id===prevJ)) selJ.value = prevJ;
-
-  const selM = document.getElementById('multaMotivo');
-  const prevM = selM.value;
-  selM.innerHTML = state.catalogo.map(c => `<option value="${c.id}">${escapeHtml(c.motivo)} (${c.importe.toFixed(2)}€)</option>`).join('') + '<option value="custom">Otro (importe personalizado)</option>';
-  if(prevM){ selM.value = prevM; }
-
-  if(!document.getElementById('multaFecha').value) document.getElementById('multaFecha').value = todayISO();
-  if(!document.getElementById('ingresoFecha').value) document.getElementById('ingresoFecha').value = todayISO();
-  actualizarImporteSugerido();
-
-  renderMultasLog();
+  const f = document.getElementById('ingresoFecha');
+  if(f && !f.value) f.value = todayISO();
   renderMultasResumen();
+  renderMultasLista();
   renderMultasAlert();
   renderIngresosList();
 }
+let multasFiltro = 'pendientes';
+const multasAbiertos = {};
+function setMultasFiltro(f){ multasFiltro = f; renderMultasLista(); }
+function toggleMultasJugador(id){ multasAbiertos[id] = !multasAbiertos[id]; renderMultasLista(); }
+function importeCobrado(m){ return m.importeFinal != null ? m.importeFinal : m.importeBase; }
 function actualizarImporteSugerido(){
   const selM = document.getElementById('multaMotivo');
+  if(!selM) return;
   const cat = state.catalogo.find(c => c.id === selM.value);
   if(cat) document.getElementById('multaImporte').value = cat.importe.toFixed(2);
+  const wrap = document.getElementById('multaCustomWrap');
+  if(wrap) wrap.style.display = selM.value === 'custom' ? 'block' : 'none';
+}
+function abrirModalMulta(jugadorId){
+  const jugs = [...state.jugadores].filter(j => !j.filial).sort(comparaPosicion);
+  openModal(`
+    <h3>Nueva multa</h3>
+    <label>Jugador<select id="multaJugador">${jugs.map(j => `<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`).join('')}</select></label>
+    <label>Motivo<select id="multaMotivo" onchange="actualizarImporteSugerido()">${state.catalogo.map(c => `<option value="${c.id}">${escapeHtml(c.motivo)} (${c.importe.toFixed(2)}€)</option>`).join('')}<option value="custom">Otro (importe personalizado)</option></select></label>
+    <label id="multaCustomWrap" style="display:none">Describe el motivo<input type="text" id="multaMotivoCustom" placeholder="Ej: Tiró el balón al río"></label>
+    <div class="form-grid">
+      <label>Importe (€)<input type="number" inputmode="decimal" id="multaImporte" step="0.5" min="0"></label>
+      <label>Fecha<input type="date" id="multaFecha" value="${todayISO()}"></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="registrarMulta()">Añadir multa</button>
+    </div>`);
+  if(jugadorId && jugs.find(j => j.id === jugadorId)) document.getElementById('multaJugador').value = jugadorId;
+  actualizarImporteSugerido();
 }
 function calcularRecargo(fechaISO, refDate){
   const fecha = new Date(fechaISO + 'T00:00:00');
@@ -3066,13 +3197,15 @@ async function registrarMulta(){
   if(!jugadorId || isNaN(importe) || !fecha){ showToast('Completa jugador, importe y fecha.'); return; }
   let motivoTexto;
   if(motivoSel === 'custom'){
-    motivoTexto = (prompt('Describe el motivo:') || '').trim() || 'Otro';
+    motivoTexto = (document.getElementById('multaMotivoCustom').value || '').trim() || 'Otro';
   } else {
     const cat = state.catalogo.find(c => c.id === motivoSel);
     motivoTexto = cat ? cat.motivo : 'Otro';
   }
   const nuevaMulta = {id:uid(), jugadorId, motivo:motivoTexto, importeBase:importe, fecha, pagada:false, fechaPago:null, importeFinal:null};
   state.multas.push(nuevaMulta);
+  multasAbiertos[jugadorId] = true;
+  closeModal();
   await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: nuevaMulta});
   renderMultasTab();
   showToast('Multa registrada.');
@@ -3084,6 +3217,20 @@ async function marcarPagada(id, pagada){
   m.importeFinal = pagada ? importeActual({...m, pagada:false}) : null;
   await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: m});
   renderMultasTab();
+  showToast(pagada ? 'Cobrada ✓' : 'Vuelve a estar pendiente.');
+}
+async function marcarTodoPagado(jugadorId){
+  const pend = state.multas.filter(m => m.jugadorId === jugadorId && !m.pagada);
+  if(!pend.length) return;
+  const j = state.jugadores.find(x => x.id === jugadorId);
+  const total = pend.reduce((s,m) => s + importeActual(m), 0);
+  if(!confirm(`¿Marcar como pagadas las ${pend.length} multas de ${j ? formatName(j.nombre) : 'este jugador'} (${money(total)})?`)) return;
+  for(const m of pend){
+    m.pagada = true; m.fechaPago = todayISO(); m.importeFinal = importeActual({...m, pagada:false});
+    await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: m});
+  }
+  renderMultasTab();
+  showToast('Todo cobrado ✓');
 }
 async function borrarMulta(id){
   if(!confirm('¿Borrar esta multa?')) return;
@@ -3092,47 +3239,146 @@ async function borrarMulta(id){
   renderMultasTab();
   showToast('Multa eliminada.');
 }
-function renderMultasLog(){
-  const sorted = [...state.multas].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-  document.getElementById('multasLogBody').innerHTML = sorted.map(m => {
-    const jugador = state.jugadores.find(j => j.id === m.jugadorId);
-    const recargo = !m.pagada ? calcularRecargo(m.fecha) : 0;
-    const total = importeActual(m);
+function multasPorJugador(){
+  const lista = [];
+  const conocidos = new Set(state.jugadores.map(j => j.id));
+  state.jugadores.forEach(j => {
+    const propias = state.multas.filter(m => m.jugadorId === j.id);
+    if(j.filial && !propias.length) return;
+    lista.push(resumenMultasJugador(j, propias));
+  });
+  const huerfanas = state.multas.filter(m => !conocidos.has(m.jugadorId));
+  if(huerfanas.length) lista.push(resumenMultasJugador({id:'__sin_jugador', dorsal:'?', nombre:'(jugador eliminado)'}, huerfanas));
+  return lista;
+}
+function resumenMultasJugador(j, propias){
+  const pend = propias.filter(m => !m.pagada).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+  const pag = propias.filter(m => m.pagada).sort((a,b) => new Date(b.fechaPago||b.fecha) - new Date(a.fechaPago||a.fecha));
+  return {
+    j, propias, pend, pag,
+    pendiente: pend.reduce((s,m) => s + importeActual(m), 0),
+    pagado: pag.reduce((s,m) => s + importeCobrado(m), 0)
+  };
+}
+function filaMultaHtml(m){
+  const recargo = !m.pagada ? calcularRecargo(m.fecha) : 0;
+  const total = importeActual(m);
+  const sub = m.pagada
+    ? `${formatDateShort(m.fecha)} · pagada el ${formatDateShort(m.fechaPago || m.fecha)}`
+    : `${formatDateShort(m.fecha)}${recargo > 0 ? ` · <span class="late">+${money(recargo)} recargo</span>` : ''}`;
+  return `
+    <div class="mj-fine ${m.pagada ? 'paid' : ''}">
+      <div class="mj-fine-main"><strong>${escapeHtml(m.motivo)}</strong><small>${sub}</small></div>
+      <span class="mj-fine-amt">${money(total)}</span>
+      ${m.pagada
+        ? `<button type="button" class="btn-undo" onclick="marcarPagada('${m.id}', false)">Deshacer</button>`
+        : `<button type="button" class="btn-cobrar" onclick="marcarPagada('${m.id}', true)">✓ Cobrar</button>`}
+      <button type="button" class="icon-btn danger" onclick="borrarMulta('${m.id}')">🗑</button>
+    </div>`;
+}
+function renderMultasLista(){
+  const cont = document.getElementById('multasLista');
+  if(!cont) return;
+  document.querySelectorAll('#multasFiltro .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.f === multasFiltro));
+  let filas = multasPorJugador();
+  if(multasFiltro === 'pendientes') filas = filas.filter(r => r.pend.length).sort((a,b) => b.pendiente - a.pendiente);
+  else if(multasFiltro === 'pagadas') filas = filas.filter(r => r.pag.length).sort((a,b) => b.pagado - a.pagado);
+  else filas = filas.filter(r => !r.j.filial || r.propias.length).sort((a,b) => (b.pendiente - a.pendiente) || (a.j.dorsal - b.j.dorsal));
+
+  if(!filas.length){
+    const msg = multasFiltro === 'pendientes' ? '🎉 Nadie debe nada ahora mismo.'
+      : multasFiltro === 'pagadas' ? 'Todavía no hay multas pagadas.' : 'No hay jugadores.';
+    cont.innerHTML = `<div class="empty-state"><p>${msg}</p></div>`;
+    return;
+  }
+  cont.innerHTML = filas.map(r => {
+    const id = r.j.id;
+    const abierto = !!multasAbiertos[id];
+    const fines = multasFiltro === 'pendientes' ? r.pend
+      : multasFiltro === 'pagadas' ? r.pag
+      : [...r.propias].sort((a,b) => (a.pagada - b.pagada) || (new Date(b.fecha) - new Date(a.fecha)));
+    const importe = multasFiltro === 'pagadas' ? r.pagado : (multasFiltro === 'pendientes' ? r.pendiente : r.pendiente);
+    const sub = multasFiltro === 'pagadas' ? `${r.pag.length} pagada${r.pag.length===1?'':'s'}`
+      : r.pend.length ? `${r.pend.length} pendiente${r.pend.length===1?'':'s'}${multasFiltro==='todas' && r.pag.length ? ` · ${r.pag.length} pagada${r.pag.length===1?'':'s'}` : ''}`
+      : (r.propias.length ? 'Al día ✓' : 'Sin multas');
+    const claseImp = (multasFiltro === 'pagadas' || r.pendiente <= 0) ? 'ok' : '';
+    const textoImp = (multasFiltro === 'todas' && r.pendiente <= 0) ? '✓' : money(importe);
+    const real = id !== '__sin_jugador';
     return `
-    <tr class="${recargo>0 ? 'row-overdue':''}">
-      <td>${formatDateShort(m.fecha)}</td>
-      <td>${jugador ? escapeHtml(formatName(jugador.nombre)) : '—'}</td>
-      <td>${escapeHtml(m.motivo)}</td>
-      <td>${money(total)}${recargo>0?`<br><span class="muted small">+${money(recargo)} recargo</span>`:''}</td>
-      <td><input type="checkbox" ${m.pagada?'checked':''} onchange="marcarPagada('${m.id}', this.checked)"></td>
-      <td><button class="icon-btn danger" onclick="borrarMulta('${m.id}')">🗑</button></td>
-    </tr>`;
+    <div class="mj-card ${abierto ? 'open' : ''} ${r.pendiente > 0 && multasFiltro !== 'pagadas' ? 'debt' : (r.pagado > 0 ? 'okc' : '')}">
+      <button type="button" class="mj-head" onclick="toggleMultasJugador('${id}')">
+        ${real ? avatarHtml(r.j) : '<span class="dorsal-badge">?</span>'}
+        <span class="mj-name"><strong>${escapeHtml(formatName(r.j.nombre))}</strong><small>${sub}</small></span>
+        <span class="mj-amt ${claseImp}">${textoImp}</span>
+        <span class="mj-chev">▶</span>
+      </button>
+      ${abierto ? `
+      <div class="mj-body">
+        ${fines.map(filaMultaHtml).join('') || '<p class="hint" style="margin:12px 0 0">Sin multas en esta vista.</p>'}
+        ${real ? `
+        <div class="mj-actions">
+          ${r.pend.length ? `<button type="button" class="btn-cobrar" onclick="marcarTodoPagado('${id}')">✓ Cobrar todo · ${money(r.pendiente)}</button>` : '<span></span>'}
+          ${r.pend.length ? `<button type="button" class="btn-secondary" onclick="compartirPendientes('${id}', true)">📤 Enviar</button>` : '<span></span>'}
+          <button type="button" class="btn-secondary" onclick="abrirModalMulta('${id}')">+ Multa</button>
+        </div>` : ''}
+      </div>` : ''}
+    </div>`;
   }).join('');
 }
+
+/* Texto para pegar en el grupo de WhatsApp: sustituye a hacer una captura de pantalla. */
+function textoPendientes(jugadorId, conDetalle){
+  const filas = multasPorJugador().filter(r => r.pend.length && (!jugadorId || r.j.id === jugadorId))
+    .sort((a,b) => b.pendiente - a.pendiente);
+  if(!filas.length) return '';
+  const L = [];
+  L.push('💸 MULTAS PENDIENTES · Cadete A');
+  L.push(formatDateLong(todayISO()));
+  L.push('');
+  let total = 0, hayRecargo = false;
+  filas.forEach(r => {
+    total += r.pendiente;
+    const nombre = formatName(r.j.nombre);
+    if(conDetalle){
+      L.push(`${r.j.dorsal} · ${nombre} — ${money(r.pendiente)}`);
+      r.pend.forEach(m => {
+        const rec = calcularRecargo(m.fecha);
+        if(rec > 0) hayRecargo = true;
+        L.push(`   · ${formatDateShort(m.fecha)} ${m.motivo} — ${money(m.importeBase)}${rec > 0 ? ` (+${money(rec)} recargo)` : ''}`);
+      });
+      L.push('');
+    } else {
+      r.pend.forEach(m => { if(calcularRecargo(m.fecha) > 0) hayRecargo = true; });
+      L.push(`• ${nombre} — ${money(r.pendiente)}`);
+    }
+  });
+  if(!conDetalle) L.push('');
+  if(filas.length > 1) L.push(`TOTAL PENDIENTE: ${money(total)}`);
+  if(hayRecargo) L.push('Recargo: 0,50 € por cada semana sin pagar pasadas las 2 primeras.');
+  return L.join('\n').trim();
+}
+async function compartirPendientes(jugadorId, conDetalle){
+  const texto = textoPendientes(jugadorId, conDetalle);
+  if(!texto){ showToast('No hay multas pendientes.'); return; }
+  if(navigator.share){
+    try{ await navigator.share({title:'Multas pendientes · Cadete A', text:texto}); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  try{ await navigator.clipboard.writeText(texto); showToast('Texto copiado. Pégalo en el grupo.'); }
+  catch(e){ prompt('Copia este texto:', texto); }
+}
 function renderMultasResumen(){
-  const rows = state.jugadores.filter(j => !j.filial).map(j => {
-    const propias = state.multas.filter(m => m.jugadorId === j.id);
-    const total = propias.reduce((s,m) => s + importeActual(m), 0);
-    const pagado = propias.filter(m=>m.pagada).reduce((s,m)=> s + (m.importeFinal!=null?m.importeFinal:m.importeBase), 0);
-    const pendiente = total - pagado;
-    return {j, total, pagado, pendiente};
-  }).sort((a,b) => b.pendiente - a.pendiente);
-
-  document.getElementById('multasResumenBody').innerHTML = rows.map(r => `
-    <tr class="${r.pendiente>0?'row-debt':''}">
-      <td>${r.j.dorsal} · ${escapeHtml(formatName(r.j.nombre))}</td>
-      <td>${money(r.total)}</td>
-      <td>${money(r.pagado)}</td>
-      <td><strong>${money(r.pendiente)}</strong></td>
-    </tr>`).join('');
-
-  const totalCobrado = state.multas.filter(m=>m.pagada).reduce((s,m)=> s + (m.importeFinal!=null?m.importeFinal:m.importeBase),0);
+  const totalCobrado = state.multas.filter(m=>m.pagada).reduce((s,m)=> s + importeCobrado(m),0);
   const totalPendiente = state.multas.filter(m=>!m.pagada).reduce((s,m)=> s + importeActual(m), 0);
   const totalIngresos = state.ingresos.reduce((s,i) => s + (Number(i.importe)||0), 0);
+  const deudores = new Set(state.multas.filter(m=>!m.pagada).map(m => m.jugadorId)).size;
   document.getElementById('totalCobrado').textContent = money(totalCobrado);
   document.getElementById('totalPendiente').textContent = money(totalPendiente);
   document.getElementById('totalIngresos').textContent = money(totalIngresos);
   document.getElementById('totalFondo').textContent = money(totalCobrado + totalIngresos);
+  document.getElementById('pendienteSub').textContent = deudores
+    ? `${deudores} jugador${deudores===1?'':'es'} por pagar`
+    : 'Todo al día 🎉';
 }
 async function registrarIngreso(){
   const concepto = document.getElementById('ingresoConcepto').value.trim();
@@ -3391,6 +3637,7 @@ async function previewArchivoBalonParado(e){
 function abrirModalBalonParado(id){
   const item = id ? state.balonParado.find(b => b.id === id) : null;
   bpArchivoPendiente = undefined; bpArchivoTipoPendiente = undefined;
+  bpAsig = item && item.asignaciones ? item.asignaciones.map(a => ({num:String(a.num), jugadorId:a.jugadorId})) : [];
   openModal(`
     <h3>${item ? 'Editar jugada' : 'Nueva jugada a balón parado'}</h3>
     <label>Nombre<input type="text" id="mBpNombre" placeholder="Ej: Córner cerrado" value="${item?escapeHtml(item.nombre):''}"></label>
@@ -3405,6 +3652,12 @@ function abrirModalBalonParado(id){
         <option value="derecha" ${item&&item.lado==='derecha'?'selected':''}>Derecha</option>
       </select></label>
     </div>
+    <div class="bp-jug" style="box-shadow:none;background:var(--bg)">
+      <h4>Números de la jugada</h4>
+      <p class="hint" style="margin:0 0 8px">Pon el número que aparece en el dibujo y elige qué jugador es.</p>
+      <div id="bpAsigList"></div>
+      <button type="button" class="btn-secondary" style="width:100%" onclick="bpAsigAdd()">+ Añadir número</button>
+    </div>
     <label>Documento (PDF o foto, máx. 4 MB)<input type="file" accept=".pdf,image/*" id="mBpArchivo" onchange="previewArchivoBalonParado(event)"></label>
     <div class="img-preview-box ${item&&item.archivo?'':'empty'}" id="mBpArchivoPreview">
       ${item&&item.archivo ? (item.archivoTipo==='pdf' ? '📄 PDF ya guardado' : `<img src="${item.archivo}">`) : 'Sin archivo seleccionado'}
@@ -3413,21 +3666,45 @@ function abrirModalBalonParado(id){
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="guardarBalonParado('${id||''}')">Guardar</button>
     </div>`);
+  bpAsigRender();
 }
+let bpAsig = [];
+function bpAsigRender(){
+  const el = document.getElementById('bpAsigList');
+  if(!el) return;
+  const jugs = [...state.jugadores].sort(comparaPosicion);
+  el.innerHTML = bpAsig.map((a, i) => `
+    <div class="inline-form" style="flex-wrap:nowrap;margin-bottom:8px">
+      <input type="text" inputmode="numeric" style="width:56px;text-align:center;font-weight:700" value="${escapeHtml(a.num)}" oninput="bpAsig[${i}].num=this.value.trim()" placeholder="Nº">
+      <span class="muted">=</span>
+      <select style="flex:1;min-width:0;padding:9px;border:1px solid var(--border);border-radius:9px;font-size:14px;background:#fff" onchange="bpAsig[${i}].jugadorId=this.value">
+        <option value="">Elige jugador</option>
+        ${jugs.map(j => `<option value="${j.id}" ${a.jugadorId===j.id?'selected':''}>${escapeHtml(formatName(j.nombre))}</option>`).join('')}
+      </select>
+      <button type="button" class="icon-btn danger" onclick="bpAsigDel(${i})">🗑</button>
+    </div>`).join('');
+}
+function bpAsigAdd(){
+  const nums = bpAsig.map(a => parseInt(a.num, 10)).filter(n => !isNaN(n));
+  bpAsig.push({num: String(nums.length ? Math.max(...nums) + 1 : 0), jugadorId: ''});
+  bpAsigRender();
+}
+function bpAsigDel(i){ bpAsig.splice(i, 1); bpAsigRender(); }
 async function guardarBalonParado(id){
   const nombre = document.getElementById('mBpNombre').value.trim();
   const tipo = document.getElementById('mBpTipo').value;
   const lado = document.getElementById('mBpLado').value;
+  const asignaciones = bpAsig.filter(a => a.num !== '' && a.jugadorId).map(a => ({num: String(a.num), jugadorId: a.jugadorId}));
   if(!nombre){ showToast('Ponle un nombre a la jugada.'); return; }
   let itemFinal;
   if(id){
     const b = state.balonParado.find(x => x.id === id);
-    b.nombre = nombre; b.tipo = tipo; b.lado = lado;
+    b.nombre = nombre; b.tipo = tipo; b.lado = lado; b.asignaciones = asignaciones;
     if(bpArchivoPendiente !== undefined){ b.archivo = bpArchivoPendiente; b.archivoTipo = bpArchivoTipoPendiente; }
     itemFinal = b;
   } else {
     if(!bpArchivoPendiente){ showToast('Adjunta un PDF o una foto.'); return; }
-    itemFinal = {id:uid(), nombre, tipo, lado, archivo: bpArchivoPendiente, archivoTipo: bpArchivoTipoPendiente};
+    itemFinal = {id:uid(), nombre, tipo, lado, asignaciones, archivo: bpArchivoPendiente, archivoTipo: bpArchivoTipoPendiente};
     state.balonParado.push(itemFinal);
   }
   await guardarColeccion(STORAGE_KEYS.balonParado, {tipo:'upsert', item: itemFinal});
@@ -3442,13 +3719,52 @@ async function borrarBalonParado(id){
   renderBalonParadoList();
   showToast('Eliminada.');
 }
+function bpAsigOrdenadas(item){
+  return (item.asignaciones || []).map(a => {
+    const j = state.jugadores.find(x => x.id === a.jugadorId);
+    return j ? {num: String(a.num), nombre: formatName(j.nombre)} : null;
+  }).filter(Boolean).sort((a,b) => (parseFloat(a.num) - parseFloat(b.num)) || a.num.localeCompare(b.num));
+}
+function dataUrlToBlobUrl(d){
+  const [h, b] = d.split(',');
+  const mime = (h.match(/:(.*?);/) || [])[1] || 'application/pdf';
+  const bin = atob(b);
+  const arr = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return URL.createObjectURL(new Blob([arr], {type: mime}));
+}
+let bpBlobUrl = null;
+function bpVisorAbierto(){ return !document.getElementById('bpPage').classList.contains('hidden'); }
 function verBalonParado(id){
   const item = state.balonParado.find(b => b.id === id);
   if(!item || !item.archivo) return;
-  const w = window.open();
-  if(!w){ showToast('El navegador ha bloqueado la ventana. Permite ventanas emergentes para verlo.'); return; }
-  if(item.archivoTipo === 'pdf') w.location.href = item.archivo;
-  else w.document.write(`<title>${escapeHtml(item.nombre)}</title><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${item.archivo}" style="max-width:100%;max-height:100vh;"></body>`);
+  if(bpBlobUrl){ URL.revokeObjectURL(bpBlobUrl); bpBlobUrl = null; }
+  const asig = bpAsigOrdenadas(item);
+  let media;
+  if(item.archivoTipo === 'pdf'){
+    bpBlobUrl = dataUrlToBlobUrl(item.archivo);
+    media = `<iframe class="bp-pdf" src="${bpBlobUrl}" title="${escapeHtml(item.nombre)}"></iframe>`;
+  } else {
+    media = `<p class="hint" style="margin-bottom:8px">Toca la imagen para ampliarla y toca otra vez para reducirla.</p>
+      <div class="bp-zoom" onclick="this.classList.toggle('zoomed')"><img class="bp-img" src="${item.archivo}" alt="${escapeHtml(item.nombre)}"></div>`;
+  }
+  document.getElementById('bpTitulo').textContent = item.nombre;
+  document.getElementById('bpBody').innerHTML = `
+    <div class="bp-chips"><span class="badge tit">${item.tipo==='ataque'?'Ataque':'Defensa'}</span><span class="badge nc">${LADO_LABEL[item.lado]||'Centro'}</span></div>
+    ${asig.length ? `<div class="bp-jug"><h4>Quién es quién</h4><div class="bp-jug-list">${asig.map(a => `<span>${escapeHtml(a.num)} · ${escapeHtml(a.nombre)}</span>`).join('')}</div></div>` : ''}
+    ${media}`;
+  closeModal();
+  const pg = document.getElementById('bpPage');
+  pg.classList.remove('hidden'); pg.scrollTop = 0;
+  document.body.classList.add('ficha-open');
+  if(location.hash !== '#jugada') location.hash = 'jugada';
+}
+function cerrarBpVisor(){ if(location.hash === '#jugada') history.back(); else ocultarBpVisor(); }
+function ocultarBpVisor(){
+  document.getElementById('bpPage').classList.add('hidden');
+  document.getElementById('bpBody').innerHTML = '';
+  document.body.classList.remove('ficha-open');
+  if(bpBlobUrl){ URL.revokeObjectURL(bpBlobUrl); bpBlobUrl = null; }
 }
 const LADO_LABEL = {izquierda:'Izquierda', centro:'Centro', derecha:'Derecha'};
 function renderBalonParadoList(){
@@ -3461,7 +3777,7 @@ function renderBalonParadoList(){
     <div class="list-row">
       <span class="list-name" onclick="verBalonParado('${b.id}')" style="cursor:pointer">
         <strong>${escapeHtml(b.nombre)}</strong><br>
-        <span class="muted small">${b.tipo==='ataque'?'Ataque':'Defensa'} · ${LADO_LABEL[b.lado]||'Centro'} · ${b.archivoTipo==='pdf'?'PDF':'Foto'}</span>
+        <span class="muted small">${b.tipo==='ataque'?'Ataque':'Defensa'} · ${LADO_LABEL[b.lado]||'Centro'} · ${b.archivoTipo==='pdf'?'PDF':'Foto'}</span>${bpAsigOrdenadas(b).length?`<br><span class="muted small">👥 ${bpAsigOrdenadas(b).map(a => escapeHtml(a.num)+' '+escapeHtml(a.nombre)).join(' · ')}</span>`:''}
       </span>
       <div class="row-actions">
         <button class="icon-btn" onclick="abrirModalBalonParado('${b.id}')">✎</button>
@@ -3543,9 +3859,9 @@ async function borrarMotivo(id){
   renderCatalogoList(); renderMultasTab();
 }
 async function confirmarBorrarTodo(){
-  if(!confirm('Esto borrará TODOS los datos: jugadores, entrenadores, partidos, multas, ingresos, ejercicios, tests y balón parado. ¿Seguro?')) return;
+  if(!confirm('Esto borrará TODOS los datos: jugadores, entrenadores, partidos, multas, ingresos, ejercicios, tests, balón parado y tareas. ¿Seguro?')) return;
   if(!confirm('De verdad, ¿seguro? Esta acción no se puede deshacer.')) return;
-  state.jugadores = []; state.entrenadores = []; state.partidos = []; state.multas = []; state.ejercicios = []; state.tests = []; state.ingresos = []; state.balonParado = [];
+  state.jugadores = []; state.entrenadores = []; state.partidos = []; state.multas = []; state.ejercicios = []; state.tests = []; state.ingresos = []; state.balonParado = []; state.tareas = [];
   state.catalogo = CATALOGO_DEFAULT.map(c => ({...c}));
   state.config = {...CONFIG_DEFAULT};
   await Promise.all([
@@ -3558,7 +3874,8 @@ async function confirmarBorrarTodo(){
     saveKey(STORAGE_KEYS.ejercicios, []),
     saveKey(STORAGE_KEYS.tests, []),
     saveKey(STORAGE_KEYS.ingresos, []),
-    saveKey(STORAGE_KEYS.balonParado, [])
+    saveKey(STORAGE_KEYS.balonParado, []),
+    saveKey(STORAGE_KEYS.tareas, [])
   ]);
   renderAll();
   showToast('Datos borrados.');
