@@ -400,6 +400,22 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 .bp-num{font-family:'Oswald',sans-serif;font-weight:600;min-width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;padding:0 4px;}
 .bp-opts{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
 
+.mf-label{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.03em;font-size:13px;color:var(--navy);margin:16px 0 8px;display:flex;justify-content:space-between;align-items:center;}
+.mf-label a{font-family:'Inter',sans-serif;text-transform:none;letter-spacing:0;font-size:12px;color:var(--red);font-weight:600;cursor:pointer;padding:2px 4px;}
+.mf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mf-grid3{grid-template-columns:repeat(4,1fr);gap:6px;}
+.mf-list{display:flex;flex-direction:column;gap:6px;}
+.mf-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border:2px solid var(--border);background:#fff;border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-size:13.5px;line-height:1.25;color:var(--text);font-weight:500;width:100%;}
+.mf-row b{font-family:'Oswald',sans-serif;color:var(--red);font-size:15px;font-weight:600;white-space:nowrap;}
+.mf-row.sel{border-color:var(--navy);background:#EEF1F8;}
+.mf-chip{border:2px solid var(--border);background:#fff;border-radius:12px;padding:10px 11px;text-align:left;cursor:pointer;font-size:13px;line-height:1.25;color:var(--text);font-weight:500;}
+.mf-chip b{display:block;font-family:'Oswald',sans-serif;color:var(--red);font-size:15px;margin-top:3px;font-weight:600;}
+.mf-chip.sel{border-color:var(--navy);background:#EEF1F8;}
+.mf-p{border:2px solid var(--border);background:#fff;border-radius:12px;padding:7px 2px;text-align:center;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mf-p span{display:block;font-family:'Oswald',sans-serif;font-size:11px;color:var(--muted);font-weight:500;}
+.mf-p.sel{background:var(--navy);border-color:var(--navy);color:#fff;}
+.mf-p.sel span{color:#cbd3e6;}
+
 @media (min-width:700px){
   .bottom-nav{max-width:720px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 }
@@ -694,7 +710,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '14/11/2026 - 15:00 multas y tareas';
+const APP_VERSION = '14/11/2026 - 17:00 multas y tareas';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -3177,6 +3193,21 @@ function estadoJugadorPartido(p, jid){
   const once = new Set(Object.values(p.alineacion || {}));
   return (once.has(jid) || e.condicion === 'titular') ? 'tit' : 'sup';
 }
+/* Un jugador solo aparece en un número de la jugada: en el que va más arriba en la lista
+   (menos jugadores por delante). Si empata, en el número más bajo. */
+function bpDedupe(asig){
+  let cambio = true, guard = 0;
+  while(cambio && guard++ < 50){
+    cambio = false;
+    const mejor = {};
+    asig.forEach((a, ai) => a.ids.forEach((id, r) => { if(!mejor[id] || r < mejor[id].r) mejor[id] = {ai, r}; }));
+    asig.forEach((a, ai) => {
+      const nuevos = a.ids.filter(id => mejor[id].ai === ai);
+      if(nuevos.length !== a.ids.length){ a.ids = nuevos; cambio = true; }
+    });
+  }
+  return asig;
+}
 function abrirModalBPPartido(pid){
   openModal('');
   renderBPPartido(pid);
@@ -3199,13 +3230,13 @@ function renderBPPartido(pid){
     const jugadas = state.balonParado.filter(b => (b.tipo || 'ataque') === tipo);
     if(!jugadas.length) return '';
     return `<div class="res-sub">${titulo}</div>` + jugadas.map(b => {
-      const asig = bpAsigOrdenadas(b).map(a => ({...a, ids: (haytit && b.tipo === 'ataque') ? a.ids.filter(id => estadoJugadorPartido(p, id) === 'tit') : a.ids}));
+      const asig = bpDedupe(bpAsigOrdenadas(b).map(a => ({...a, ids: haytit ? a.ids.filter(id => estadoJugadorPartido(p, id) === 'tit') : [...a.ids]})));
       const filas = asig.map(a => {
         const sel = elecc.find(e => e.playId === b.id && String(e.num) === a.num);
-        const COMODIN = ['3','4','5'];
+        const COMODIN = b.tipo === 'ataque' ? ['3','4','5'] : ['6','7','8'];
         const extras = [], extraDe = {};
         /* Si en el 3, 4 o 5 no queda ningún titular, lo cubre uno de los que sobran en otro de esos tres números (el que tiene 2 o más titulares). */
-        if(b.tipo === 'ataque' && COMODIN.includes(a.num) && a.ids.length === 0){
+        if(COMODIN.includes(a.num) && a.ids.length === 0){
           asig.filter(o => o.num !== a.num && COMODIN.includes(o.num) && o.ids.length >= 2)
               .forEach(o => o.ids.forEach(id => { if(!extras.includes(id)){ extras.push(id); extraDe[id] = o.num; } }));
         }
@@ -3214,7 +3245,7 @@ function renderBPPartido(pid){
           if(!j) return '';
           const est = estadoJugadorPartido(p, id);
           const otro = elecc.find(e => e.playId === b.id && e.jugadorId === id && String(e.num) !== a.num);
-          return `<button type="button" class="bp-opt ${est === 'no' ? 'no' : ''} ${extra ? 'extra' : ''} ${otro ? 'used' : ''} ${sel && sel.jugadorId === id ? 'sel' : ''}" data-num="${escapeHtml(a.num)}" onclick="bpElegir('${pid}','${b.id}',this.dataset.num,'${id}')">${escapeHtml(formatName(j.nombre))}${otro ? `<small>en el ${escapeHtml(otro.num)}</small>` : (extra && extraDe[id] ? `<small>del ${escapeHtml(extraDe[id])}</small>` : (b.tipo === 'defensa' && est === 'sup' ? '<small>S</small>' : ''))}</button>`;
+          return `<button type="button" class="bp-opt ${est === 'no' ? 'no' : ''} ${extra ? 'extra' : ''} ${otro ? 'used' : ''} ${sel && sel.jugadorId === id ? 'sel' : ''}" data-num="${escapeHtml(a.num)}" onclick="bpElegir('${pid}','${b.id}',this.dataset.num,'${id}')">${escapeHtml(formatName(j.nombre))}${otro ? `<small>en el ${escapeHtml(otro.num)}</small>` : (extra && extraDe[id] ? `<small>del ${escapeHtml(extraDe[id])}</small>` : '')}</button>`;
         };
         const ningunoDisp = a.ids.length === 0 && extras.length === 0;
         return `<div class="bp-row">
@@ -3236,16 +3267,15 @@ function renderBPPartido(pid){
     }).join('');
   };
   cont.innerHTML = cab + `
-    ${haytit ? '<p class="hint">En <strong>ataque</strong> solo aparecen los titulares (el once de la alineación o los marcados como titulares en la convocatoria). En <strong>defensa</strong> salen todos los convocados (S = suplente). Toca uno para elegirlo en este partido. En ataque, si en el 3, 4 o 5 no hay ningún titular, lo cubre uno de los que sobran en otro de esos tres números (salen después de «puede cubrir»). Si ya está en otro número de la jugada, aparece atenuado.</p>'
-             : '<p class="hint" style="color:var(--red-dark)">Este partido aún no tiene titulares marcados, así que se muestran todos. Pon la alineación o marca los titulares en la convocatoria para que en ataque solo salgan ellos.</p>'}
+    ${haytit ? '<p class="hint">Solo aparecen los <strong>titulares</strong> (el once de la alineación o los marcados como titulares en la convocatoria). Si un jugador está en varios números, sale solo en el que va más arriba en la lista. Si en el 3, 4 o 5 (ataque) o en el 6, 7 u 8 (defensa) no hay ningún titular, lo cubre uno de los que sobran en otro de esos tres números (salen después de «puede cubrir»). Toca uno para elegirlo en este partido.</p>'
+             : '<p class="hint" style="color:var(--red-dark)">Este partido aún no tiene titulares marcados, así que se muestran todos. Pon la alineación o marca los titulares en la convocatoria para que solo salgan ellos.</p>'}
     ${seccion('ataque', 'Ataque')}${seccion('defensa', 'Defensa')}` + cierre;
 }
 async function bpElegir(pid, playId, num, jid){
   const p = state.partidos.find(x => x.id === pid);
   if(!p) return;
   if(estadoJugadorPartido(p, jid) === 'no'){ showToast('No está convocado en este partido.'); return; }
-  const playSel = state.balonParado.find(x => x.id === playId);
-  if(playSel && playSel.tipo === 'ataque' && state.jugadores.some(j => estadoJugadorPartido(p, j.id) === 'tit') && estadoJugadorPartido(p, jid) !== 'tit'){ showToast('Solo pueden ser titulares.'); return; }
+  if(state.jugadores.some(j => estadoJugadorPartido(p, j.id) === 'tit') && estadoJugadorPartido(p, jid) !== 'tit'){ showToast('Solo pueden ser titulares.'); return; }
   let elecc = Array.isArray(p.bpElecciones) ? [...p.bpElecciones] : (p.bpElecciones ? Object.values(p.bpElecciones) : []);
   const otro = elecc.find(e => e.playId === playId && e.jugadorId === jid && String(e.num) !== String(num));
   if(otro){ showToast(`Ya está en el ${otro.num} de esta jugada. Quítalo de ahí primero.`); return; }
@@ -3295,31 +3325,86 @@ const multasAbiertos = {};
 function setMultasFiltro(f){ multasFiltro = f; renderMultasLista(); }
 function toggleMultasJugador(id){ multasAbiertos[id] = !multasAbiertos[id]; renderMultasLista(); }
 function importeCobrado(m){ return m.importeFinal != null ? m.importeFinal : m.importeBase; }
-function actualizarImporteSugerido(){
-  const selM = document.getElementById('multaMotivo');
-  if(!selM) return;
-  const cat = state.catalogo.find(c => c.id === selM.value);
-  if(cat) document.getElementById('multaImporte').value = cat.importe.toFixed(2);
-  const wrap = document.getElementById('multaCustomWrap');
-  if(wrap) wrap.style.display = selM.value === 'custom' ? 'block' : 'none';
+/* Cada motivo del catálogo es de 'entreno', 'partido' o 'ambos'. Si no tiene grupo guardado, se deduce del texto. */
+function grupoMotivo(c){
+  if(c.grupo === 'entreno' || c.grupo === 'partido' || c.grupo === 'ambos') return c.grupo;
+  const t = normNombre(c.motivo);
+  if(/aviso fuera de plazo|vestuario sucio|no recoger el material|pertenencias en el vestuario|falta de respeto|uso general/.test(t)) return 'ambos';
+  if(/entrenamiento|equipacion/.test(t)) return 'entreno';
+  return 'partido';
 }
+const GRUPO_LABEL = {entreno:'Entrenamiento', partido:'Partido', ambos:'Entrenamiento y partido'};
+let multaForm = {motivo:null, jugadores:[], cambiando:false, grupo:null};
 function abrirModalMulta(jugadorId){
-  const jugs = [...state.jugadores].filter(j => !j.filial).sort(comparaPosicion);
+  multaForm = {motivo:null, jugadores: jugadorId ? [jugadorId] : [], cambiando:false, grupo:null};
   openModal(`
     <h3>Nueva multa</h3>
-    <label>Jugador<select id="multaJugador">${jugs.map(j => `<option value="${j.id}">${j.dorsal} · ${escapeHtml(formatName(j.nombre))}</option>`).join('')}</select></label>
-    <label>Motivo<select id="multaMotivo" onchange="actualizarImporteSugerido()">${state.catalogo.map(c => `<option value="${c.id}">${escapeHtml(c.motivo)} (${c.importe.toFixed(2)}€)</option>`).join('')}<option value="custom">Otro (importe personalizado)</option></select></label>
-    <label id="multaCustomWrap" style="display:none">Describe el motivo<input type="text" id="multaMotivoCustom" placeholder="Ej: Tiró el balón al río"></label>
+    <div class="mf-label" style="margin-top:6px"><span>1 · ¿Quién?</span><span><a onclick="multaTodos(true)">Todos</a> · <a onclick="multaTodos(false)">Ninguno</a></span></div>
+    <div class="mf-grid mf-grid3" id="mfJugadores"></div>
+    <div class="mf-label"><span>2 · ¿Qué ha pasado?</span><a id="mfCambiar" style="display:none" onclick="multaCambiarMotivo()">Cambiar</a></div>
+    <div class="segmented mul-filtro" id="mfGrupos" style="margin-bottom:8px"></div>
+    <div class="mf-list" id="mfMotivos"></div>
+    <div id="mfCustom" style="display:none;margin-top:8px"><input type="text" id="multaMotivoCustom" placeholder="Describe el motivo (ej: Tiró el balón al río)"></div>
+    <div class="mf-label">3 · Importe y fecha</div>
     <div class="form-grid">
       <label>Importe (€)<input type="number" inputmode="decimal" id="multaImporte" step="0.5" min="0"></label>
       <label>Fecha<input type="date" id="multaFecha" value="${todayISO()}"></label>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-      <button class="btn-primary" onclick="registrarMulta()">Añadir multa</button>
+      <button class="btn-primary" id="mfBtn" onclick="registrarMulta()">Añadir multa</button>
     </div>`);
-  if(jugadorId && jugs.find(j => j.id === jugadorId)) document.getElementById('multaJugador').value = jugadorId;
-  actualizarImporteSugerido();
+  multaRender();
+}
+function multaRender(){
+  const m = document.getElementById('mfMotivos');
+  if(!m) return;
+  const fmt = n => n.toFixed(2).replace('.', ',') + ' €';
+  /* los motivos más usados salen primero */
+  const usos = {}; state.multas.forEach(x => { usos[x.motivo] = (usos[x.motivo] || 0) + 1; });
+  const cat = state.catalogo.filter(c => multaForm.grupo && (grupoMotivo(c) === 'ambos' || grupoMotivo(c) === multaForm.grupo)).sort((a,b) => (usos[b.motivo] || 0) - (usos[a.motivo] || 0));
+  const elegido = multaForm.motivo === 'custom' ? {motivo:'Otro motivo…', importe:null} : state.catalogo.find(c => c.id === multaForm.motivo);
+  const mostrarLista = !elegido || multaForm.cambiando;
+  document.getElementById('mfCambiar').style.display = (elegido && !multaForm.cambiando) ? 'inline' : 'none';
+  const tabs = document.getElementById('mfGrupos');
+  tabs.style.display = mostrarLista ? 'flex' : 'none';
+  tabs.innerHTML = `<button type="button" class="seg-btn ${multaForm.grupo === 'entreno' ? 'active' : ''}" onclick="multaSetGrupo('entreno')">🏋️ Entrenamiento</button><button type="button" class="seg-btn ${multaForm.grupo === 'partido' ? 'active' : ''}" onclick="multaSetGrupo('partido')">⚽ Partido</button>`;
+  if(!mostrarLista){
+    m.innerHTML = `<div class="mf-row sel"><span>${escapeHtml(elegido.motivo)}</span>${elegido.importe != null ? `<b>${fmt(elegido.importe)}</b>` : '<b>importe libre</b>'}</div>`;
+  } else if(!multaForm.grupo){
+    m.innerHTML = '<p class="hint" style="margin:4px 0 0">Elige si fue en un entrenamiento o en un partido.</p>';
+  } else {
+    m.innerHTML = cat.map(c => `<button type="button" class="mf-row ${multaForm.motivo === c.id ? 'sel' : ''}" onclick="multaElegirMotivo('${c.id}')"><span>${escapeHtml(c.motivo)}</span><b>${fmt(c.importe)}</b></button>`).join('')
+      + `<button type="button" class="mf-row ${multaForm.motivo === 'custom' ? 'sel' : ''}" onclick="multaElegirMotivo('custom')"><span>Otro motivo…</span><b>importe libre</b></button>`;
+  }
+  const jugs = [...state.jugadores].filter(j => !j.filial).sort(comparaPosicion);
+  document.getElementById('mfJugadores').innerHTML = jugs.map(j => `
+    <button type="button" class="mf-p ${multaForm.jugadores.includes(j.id) ? 'sel' : ''}" onclick="multaToggleJug('${j.id}')"><span>${j.dorsal}</span>${escapeHtml(formatName(j.nombre))}</button>`).join('');
+  const n = multaForm.jugadores.length;
+  document.getElementById('mfBtn').textContent = n > 1 ? `Añadir a ${n} jugadores` : 'Añadir multa';
+}
+function multaCambiarMotivo(){ multaForm.cambiando = true; multaRender(); }
+function multaSetGrupo(g){ multaForm.grupo = g; multaRender(); }
+function multaElegirMotivo(id){
+  multaForm.motivo = id; multaForm.cambiando = false;
+  const custom = document.getElementById('mfCustom');
+  if(id === 'custom'){
+    custom.style.display = 'block'; document.getElementById('multaImporte').value = '';
+    setTimeout(() => document.getElementById('multaMotivoCustom').focus(), 50);
+  } else {
+    custom.style.display = 'none';
+    const cat = state.catalogo.find(c => c.id === id);
+    if(cat) document.getElementById('multaImporte').value = cat.importe.toFixed(2);
+  }
+  multaRender();
+}
+function multaToggleJug(id){
+  multaForm.jugadores = multaForm.jugadores.includes(id) ? multaForm.jugadores.filter(x => x !== id) : [...multaForm.jugadores, id];
+  multaRender();
+}
+function multaTodos(todos){
+  multaForm.jugadores = todos ? state.jugadores.filter(j => !j.filial).map(j => j.id) : [];
+  multaRender();
 }
 function calcularRecargo(fechaISO, refDate){
   const fecha = new Date(fechaISO + 'T00:00:00');
@@ -3335,25 +3420,24 @@ function importeActual(multa){
   return multa.importeBase + calcularRecargo(multa.fecha);
 }
 async function registrarMulta(){
-  const jugadorId = document.getElementById('multaJugador').value;
-  const motivoSel = document.getElementById('multaMotivo').value;
   const importe = parseFloat(document.getElementById('multaImporte').value);
   const fecha = document.getElementById('multaFecha').value;
-  if(!jugadorId || isNaN(importe) || !fecha){ showToast('Completa jugador, importe y fecha.'); return; }
+  if(!multaForm.motivo){ showToast('Elige qué ha pasado.'); return; }
+  if(!multaForm.jugadores.length){ showToast('Elige al menos un jugador.'); return; }
+  if(isNaN(importe) || !fecha){ showToast('Revisa el importe y la fecha.'); return; }
   let motivoTexto;
-  if(motivoSel === 'custom'){
+  if(multaForm.motivo === 'custom'){
     motivoTexto = (document.getElementById('multaMotivoCustom').value || '').trim() || 'Otro';
   } else {
-    const cat = state.catalogo.find(c => c.id === motivoSel);
+    const cat = state.catalogo.find(c => c.id === multaForm.motivo);
     motivoTexto = cat ? cat.motivo : 'Otro';
   }
-  const nuevaMulta = {id:uid(), jugadorId, motivo:motivoTexto, importeBase:importe, fecha, pagada:false, fechaPago:null, importeFinal:null};
-  state.multas.push(nuevaMulta);
-  multasAbiertos[jugadorId] = true;
+  const nuevas = multaForm.jugadores.map(jugadorId => ({id:uid(), jugadorId, motivo:motivoTexto, importeBase:importe, fecha, pagada:false, fechaPago:null, importeFinal:null}));
+  nuevas.forEach(m => { state.multas.push(m); if(nuevas.length === 1) multasAbiertos[m.jugadorId] = true; });
   closeModal();
-  await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: nuevaMulta});
+  for(const m of nuevas) await guardarColeccion(STORAGE_KEYS.multas, {tipo:'upsert', item: m});
   renderMultasTab();
-  showToast('Multa registrada.');
+  showToast(nuevas.length > 1 ? `Multa añadida a ${nuevas.length} jugadores.` : 'Multa registrada.');
 }
 async function marcarPagada(id, pagada){
   const m = state.multas.find(x => x.id === id);
@@ -4073,7 +4157,7 @@ async function toggleDiaEntreno(dia){
 function renderCatalogoList(){
   document.getElementById('catalogoList').innerHTML = state.catalogo.map(c => `
     <div class="list-row">
-      <span class="list-name">${escapeHtml(c.motivo)}<br><span class="muted small">${c.importe.toFixed(2)}€</span></span>
+      <span class="list-name">${escapeHtml(c.motivo)}<br><span class="muted small">${c.importe.toFixed(2)}€ · ${GRUPO_LABEL[grupoMotivo(c)]}</span></span>
       <div class="row-actions">
         <button class="icon-btn" onclick="abrirModalMotivo('${c.id}')">✎</button>
         <button class="icon-btn danger" onclick="borrarMotivo('${c.id}')">🗑</button>
@@ -4086,6 +4170,7 @@ function abrirModalMotivo(id){
     <h3>${cat ? 'Editar motivo' : 'Nuevo motivo'}</h3>
     <label>Motivo<input type="text" id="mMotTexto" value="${cat ? escapeHtml(cat.motivo) : ''}"></label>
     <label>Importe (€)<input type="number" id="mMotImporte" step="0.5" value="${cat ? cat.importe : ''}"></label>
+    <label>Se usa en<select id="mMotGrupo">${['entreno','partido','ambos'].map(g => `<option value="${g}" ${(cat ? grupoMotivo(cat) : 'entreno') === g ? 'selected' : ''}>${GRUPO_LABEL[g]}</option>`).join('')}</select></label>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn-primary" onclick="guardarMotivo('${id||''}')">Guardar</button>
@@ -4095,13 +4180,14 @@ async function guardarMotivo(id){
   const motivo = document.getElementById('mMotTexto').value.trim();
   const importe = parseFloat(document.getElementById('mMotImporte').value);
   if(!motivo || isNaN(importe)){ showToast('Completa motivo e importe.'); return; }
+  const grupo = document.getElementById('mMotGrupo').value;
   let catFinal;
   if(id){
     const c = state.catalogo.find(x => x.id === id);
-    c.motivo = motivo; c.importe = importe;
+    c.motivo = motivo; c.importe = importe; c.grupo = grupo;
     catFinal = c;
   } else {
-    catFinal = {id:uid(), motivo, importe};
+    catFinal = {id:uid(), motivo, importe, grupo};
     state.catalogo.push(catFinal);
   }
   await guardarColeccion(STORAGE_KEYS.catalogo, {tipo:'upsert', item: catFinal});
