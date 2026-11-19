@@ -432,6 +432,43 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 .cat-extra{display:block;margin-top:3px;font-size:11.5px;line-height:1.35;color:var(--muted);}
 .cat-extra.san{color:#A81B24;font-style:italic;}
 
+.ej-grupo{background:var(--bg);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.ej-head{width:100%;display:flex;align-items:center;gap:8px;padding:12px;background:none;border:none;text-align:left;cursor:pointer;color:var(--navy);font-weight:700;font-size:14px;}
+.ej-head .ej-n{background:var(--navy);color:#fff;border-radius:20px;font-size:11px;padding:2px 9px;font-weight:600;}
+.ej-head .mj-chev{margin-left:auto;color:var(--muted);font-size:12px;transition:transform .15s;}
+.ej-grupo.open .ej-head .mj-chev{transform:rotate(90deg);}
+.ej-body{padding:0 8px 8px;}
+.ej-body .list-row{background:#fff;border-radius:10px;margin-bottom:6px;}
+.ej-ren{background:none;border:none;font-size:14px;color:var(--muted);cursor:pointer;padding:2px 6px;}
+
+/* ---- Pizarra táctica (estilo Tactical Pad) ---- */
+.modal.tp-modal{position:fixed !important;inset:0 !important;width:100vw !important;max-width:none !important;height:100vh;height:100dvh;max-height:none !important;border-radius:0 !important;padding:0 !important;background:#1c1c1e;display:flex;flex-direction:column;overflow:hidden !important;animation:none !important;z-index:950;}
+.tp-stage{position:relative;flex:1;min-height:0;overflow:hidden;background:repeating-linear-gradient(90deg,#7ba340 0 4.1666%,#8db556 4.1666% 8.3333%);touch-action:none;}
+.tp-pitch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);touch-action:none;}
+.tp-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
+.tp-corner{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));display:flex;gap:8px;z-index:20;}
+.tp-corner.l{left:8px;} .tp-corner.r{right:8px;}
+.tp-crest{width:46px;height:52px;border:none;border-radius:10px;background:rgba(20,40,80,.9);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:4px;box-shadow:0 2px 6px rgba(0,0,0,.35);outline:3px solid transparent;}
+.tp-crest.on{outline-color:#fff;}
+.tp-crest img,.tp-crest svg{width:100%;height:100%;object-fit:contain;}
+.tp-btn{width:52px;height:52px;border:none;border-radius:10px;background:rgba(60,60,64,.92);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:19px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.35);}
+.tp-btn span{font-size:8.5px;font-weight:700;}
+.tp-menu{position:absolute;top:calc(68px + env(safe-area-inset-top,0px));right:8px;z-index:30;background:#2b2b2e;border-radius:12px;padding:6px;display:none;flex-direction:column;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,.5);}
+.tp-menu.open{display:flex;}
+.tp-menu button{background:none;border:none;color:#fff;text-align:left;padding:11px 12px;font-size:14px;border-radius:8px;cursor:pointer;}
+.tp-menu button:active{background:rgba(255,255,255,.12);}
+.tp-token{position:absolute;transform:translate(-50%,-50%);width:var(--tk,40px);height:var(--tk,40px);border-radius:50%;touch-action:none;cursor:grab;z-index:5;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(90deg,#4f93de 0 18%,#1f3b78 18% 36%);border:2px solid #16294f;box-shadow:0 2px 6px rgba(0,0,0,.45);color:#fff;font-family:'Oswald',sans-serif;font-weight:700;font-size:calc(var(--tk,40px) * .5);user-select:none;-webkit-user-select:none;text-shadow:0 0 2px #0a1735,0 0 3px #0a1735,0 1px 2px #0a1735;}
+.tp-token:active{cursor:grabbing;z-index:6;}
+.tp-token.gk{background:radial-gradient(circle at 35% 30%,#8fcaff,#3a82d2);}
+.tp-token.rival{background:repeating-linear-gradient(90deg,#f0703c 0 18%,#a8321a 18% 36%);border-color:#5a1a0c;}
+.tp-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:#1c1c1e;-webkit-overflow-scrolling:touch;flex-shrink:0;}
+.tp-bt{flex:0 0 74px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px 6px;border-radius:12px;background:#4a73b0;cursor:pointer;color:#fff;border:none;}
+.tp-bt.usado{background:#3a3a3d;opacity:.8;}
+.tp-bt.rival{background:#b0402a;}
+.tp-bt.rival.usado{background:#3a3a3d;}
+.tp-bt .tp-token{position:static;transform:none;width:44px;height:44px;font-size:22px;cursor:pointer;}
+.tp-bt small{font-size:11px;font-weight:600;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
 @media (min-width:700px){
   .bottom-nav{max-width:720px;left:50%;transform:translateX(-50%);border-radius:16px 16px 0 0;border-left:1px solid var(--border);border-right:1px solid var(--border);}
 }
@@ -605,7 +642,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
       <div class="card">
         <h3>Pizarra táctica</h3>
-        <p class="hint">Mueve a los jugadores libremente por el campo para explicar movimientos o jugadas. No se guarda al cerrarla, cada vez empieza de cero.</p>
+        <p class="hint">Campo a pantalla completa con las fichas de tu equipo y las del rival: toca una ficha de la barra de abajo para ponerla, arrástrala para moverla y tócala en el campo para quitarla. Gira el móvil para verla más grande. No se guarda al cerrarla.</p>
         <button class="btn-primary" style="width:100%" onclick="abrirPizarra()">Abrir pizarra</button>
       </div>
 
@@ -614,7 +651,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
           <h3 style="margin:0">Biblioteca de ejercicios</h3>
           <button class="btn-primary" onclick="abrirModalEjercicio()">+ Añadir</button>
         </div>
-        <input type="text" id="ejercicioBuscar" placeholder="Buscar por título o categoría..." oninput="renderEjerciciosList()">
+        <input type="text" id="ejercicioBuscar" placeholder="Buscar ejercicio o categoría..." oninput="renderEjerciciosList()">
         <div id="ejerciciosList" class="list-simple" style="margin-top:10px"></div>
       </div>
 
@@ -741,7 +778,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '14/11/2026 - 22:30 The Coach Box';
+const APP_VERSION = '15/11/2026 - 12:00 The Coach Box';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -1300,7 +1337,8 @@ function openModal(html){
   document.getElementById('modalOverlay').classList.remove('hidden');
 }
 function closeModal(){
-  document.getElementById('modalContent').classList.remove('pizarra-wide');
+  if(typeof tpRO !== 'undefined' && tpRO){ try{ tpRO.disconnect(); }catch(e){} tpRO = null; }
+  document.getElementById('modalContent').classList.remove('pizarra-wide', 'tp-modal');
   document.getElementById('modalOverlay').classList.add('hidden');
   document.getElementById('modalContent').innerHTML = '';
 }
@@ -2775,129 +2813,133 @@ let pizarraEstado = null;
 function pizarraAvatarHtml(j){
   return j.foto ? `<img src="${j.foto}">` : `<span>${j.dorsal}</span>`;
 }
+let tpBarraActiva = 'mio';
+let tpRO = null;
 function abrirPizarra(){
   pizarraEstado = {enCampo: {}, rivalEnCampo: {}};
+  tpBarraActiva = 'mio';
   openModal(`
-    <h3>Pizarra táctica</h3>
-    <p class="hint pizarra-hide-fs">Toca a un jugador del banquillo para meterlo al campo, arrástralo para moverlo, y tócalo de nuevo para sacarlo. No se guarda: se reinicia cada vez que la abres.</p>
-    <div class="pizarra-hide-fs" style="display:flex;justify-content:center;margin-bottom:8px"><img src="${LOGO_BASE64}" style="height:34px;"></div>
-    <div class="pitch-wrap-h" id="pizarraPitch">
-      <svg class="pitch-lines" viewBox="0 0 100 64" preserveAspectRatio="none">
-        <rect x="1" y="1" width="98" height="62" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="0.4"/>
-        <line x1="50" y1="1" x2="50" y2="63" stroke="rgba(255,255,255,.5)" stroke-width="0.4"/>
-        <circle cx="50" cy="32" r="8" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="0.4"/>
-        <rect x="1" y="20" width="11" height="24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="0.4"/>
-        <rect x="88" y="20" width="11" height="24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="0.4"/>
-      </svg>
+    <div class="tp-stage" id="tpStage">
+      <div class="tp-corner l">
+        <button type="button" class="tp-crest on" id="tpCrestMio" onclick="tpBarra('mio')"><img src="${LOGO_BASE64}" alt="Mi equipo"></button>
+        <button type="button" class="tp-btn" onclick="cerrarPizarra()">🏠<span>Menú</span></button>
+      </div>
+      <div class="tp-corner r">
+        <button type="button" class="tp-btn" onclick="tpHerramientas()">✏️<span>Herramientas</span></button>
+        <button type="button" class="tp-crest" id="tpCrestRival" onclick="tpBarra('rival')"><svg viewBox="0 0 40 46"><path d="M20 2 L37 8 V22 C37 33 29 41 20 44 C11 41 3 33 3 22 V8 Z" fill="#c8402a" stroke="#fff" stroke-width="2.5"/><text x="20" y="28" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" font-family="Oswald,Arial">R</text></svg></button>
+      </div>
+      <div class="tp-menu" id="tpMenu">
+        <button type="button" onclick="tpReiniciar('todo')">↺ Reiniciar pizarra</button>
+        <button type="button" onclick="tpReiniciar('rival')">✕ Quitar rivales</button>
+        <button type="button" onclick="tpReiniciar('mio')">✕ Quitar mi equipo</button>
+      </div>
+      <div class="tp-pitch" id="pizarraPitch">
+        <svg class="tp-lines" viewBox="0 0 105 68" preserveAspectRatio="none">
+          <defs><pattern id="tpNet" width="1.1" height="1.1" patternUnits="userSpaceOnUse"><path d="M0 0H1.1V1.1" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".16"/></pattern></defs>
+          <g fill="none" stroke="#fff" stroke-width="0.34" stroke-linecap="square">
+            <rect x="0" y="0" width="105" height="68"/>
+            <line x1="52.5" y1="0" x2="52.5" y2="68"/>
+            <circle cx="52.5" cy="34" r="9.15"/>
+            <rect x="0" y="13.85" width="16.5" height="40.3"/><rect x="88.5" y="13.85" width="16.5" height="40.3"/>
+            <rect x="0" y="24.85" width="5.5" height="18.3"/><rect x="99.5" y="24.85" width="5.5" height="18.3"/>
+            <path d="M16.5 26.69 A9.15 9.15 0 0 1 16.5 41.31"/><path d="M88.5 26.69 A9.15 9.15 0 0 0 88.5 41.31"/>
+            <path d="M1 0 A1 1 0 0 1 0 1"/><path d="M104 0 A1 1 0 0 0 105 1"/><path d="M0 67 A1 1 0 0 0 1 68"/><path d="M105 67 A1 1 0 0 1 104 68"/>
+          </g>
+          <g fill="#fff"><circle cx="52.5" cy="34" r=".5"/><circle cx="11" cy="34" r=".45"/><circle cx="94" cy="34" r=".45"/></g>
+          <rect x="-2.4" y="30.34" width="2.4" height="7.32" fill="url(#tpNet)" stroke="rgba(255,255,255,.85)" stroke-width=".22"/>
+          <rect x="105" y="30.34" width="2.4" height="7.32" fill="url(#tpNet)" stroke="rgba(255,255,255,.85)" stroke-width=".22"/>
+        </svg>
+      </div>
     </div>
-    <div class="pizarra-hide-fs">
-      <p class="muted small" style="margin:2px 0 4px">Mi equipo</p>
-      <div class="pizarra-banquillo" id="pizarraBanquillo"></div>
-      <p class="muted small" style="margin:8px 0 4px">Rival (rojo/blanco)</p>
-      <div class="pizarra-banquillo" id="pizarraBanquilloRival"></div>
-    </div>
-    <div class="modal-actions">
-      <button type="button" class="btn-secondary" onclick="reiniciarPizarra()">Reiniciar</button>
-      <button type="button" class="btn-secondary" id="pizarraFsBtn" onclick="toggleFullscreenPizarra()">Pantalla completa</button>
-      <button type="button" class="btn-primary" onclick="cerrarPizarra()">Cerrar</button>
-    </div>`);
-  document.getElementById('modalContent').classList.add('pizarra-wide');
-  renderPizarraBanquillo();
-  renderPizarraBanquilloRival();
+    <div class="tp-bar" id="pizarraBarra"></div>`);
+  document.getElementById('modalContent').classList.add('tp-modal');
+  tpAjustar();
+  try{ tpRO = new ResizeObserver(tpAjustar); tpRO.observe(document.getElementById('tpStage')); }catch(e){ window.addEventListener('resize', tpAjustar); }
+  tpRenderBarra();
   renderPizarraCampo();
 }
-function cerrarPizarra(){
-  const modal = document.getElementById('modalContent');
-  if(modal.classList.contains('pizarra-fullscreen')){
-    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
-    modal.classList.remove('pizarra-fullscreen');
+/* Dimensiona el campo con la proporción real (105x68) y deja sitio a los botones laterales si la pantalla está apaisada. */
+function tpAjustar(){
+  const st = document.getElementById('tpStage'), p = document.getElementById('pizarraPitch');
+  if(!st || !p) return;
+  const ratio = 105 / 68;
+  const lateral = st.clientWidth > st.clientHeight * 1.25 ? 84 : 14;
+  const w = Math.max(100, Math.min(st.clientWidth - 2 * lateral, (st.clientHeight - 16) * ratio));
+  p.style.width = w + 'px'; p.style.height = (w / ratio) + 'px';
+  p.style.setProperty('--tk', Math.max(30, Math.min(56, w * 0.055)) + 'px');
+}
+function cerrarPizarra(){ closeModal(); }
+function tpBarra(que){
+  tpBarraActiva = que;
+  document.getElementById('tpCrestMio').classList.toggle('on', que === 'mio');
+  document.getElementById('tpCrestRival').classList.toggle('on', que === 'rival');
+  tpRenderBarra();
+}
+function tpHerramientas(){ document.getElementById('tpMenu').classList.toggle('open'); }
+function tpReiniciar(que){
+  if(que === 'todo' || que === 'mio') pizarraEstado.enCampo = {};
+  if(que === 'todo' || que === 'rival') pizarraEstado.rivalEnCampo = {};
+  document.getElementById('tpMenu').classList.remove('open');
+  tpRenderBarra(); renderPizarraCampo();
+}
+function reiniciarPizarra(){ tpReiniciar('todo'); }
+function tpEsPortero(j){ return DORSALES_PORTERO.includes(j.dorsal) || j.posicion === 'Portero'; }
+function tpRenderBarra(){
+  const el = document.getElementById('pizarraBarra');
+  if(!el) return;
+  if(tpBarraActiva === 'rival'){
+    el.innerHTML = Array.from({length:11}, (_, i) => i + 1).map(n => {
+      const usado = !!pizarraEstado.rivalEnCampo[n];
+      return `<button type="button" class="tp-bt rival ${usado ? 'usado' : ''}" onclick="tpToggleRival(${n})"><div class="tp-token rival">${n}</div><small>Rival ${n}</small></button>`;
+    }).join('');
+    return;
   }
-  closeModal();
+  if(!state.jugadores.length){ el.innerHTML = '<p style="color:#fff;margin:8px">Añade jugadores primero para poder colocarlos aquí.</p>'; return; }
+  el.innerHTML = [...state.jugadores].sort(comparaPosicion).map(j => {
+    const usado = !!pizarraEstado.enCampo[j.id];
+    return `<button type="button" class="tp-bt ${usado ? 'usado' : ''}" onclick="tpToggleJugador('${j.id}')"><div class="tp-token ${tpEsPortero(j) ? 'gk' : ''}">${escapeHtml(String(j.dorsal))}</div><small>${escapeHtml(formatName(j.nombre))}</small></button>`;
+  }).join('');
 }
-function toggleFullscreenPizarra(){
-  const modal = document.getElementById('modalContent');
-  const activo = modal.classList.toggle('pizarra-fullscreen');
-  document.getElementById('pizarraFsBtn').textContent = activo ? 'Salir de pantalla completa' : 'Pantalla completa';
-  if(activo){
-    try{ modal.requestFullscreen && modal.requestFullscreen().catch(()=>{}); }catch(e){}
-  } else {
-    try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(e){}
-  }
+function tpToggleJugador(jid){
+  if(pizarraEstado.enCampo[jid]) delete pizarraEstado.enCampo[jid];
+  else pizarraEstado.enCampo[jid] = {x: 30 + Math.random() * 40, y: 30 + Math.random() * 40};
+  tpRenderBarra(); renderPizarraCampo();
 }
-function reiniciarPizarra(){
-  pizarraEstado = {enCampo: {}, rivalEnCampo: {}};
-  renderPizarraBanquillo();
-  renderPizarraBanquilloRival();
-  renderPizarraCampo();
+function tpToggleRival(n){
+  if(pizarraEstado.rivalEnCampo[n]) delete pizarraEstado.rivalEnCampo[n];
+  else pizarraEstado.rivalEnCampo[n] = {x: 35 + Math.random() * 40, y: 30 + Math.random() * 40};
+  tpRenderBarra(); renderPizarraCampo();
 }
-function renderPizarraBanquillo(){
-  const disponibles = [...state.jugadores].sort(comparaPosicion).filter(j => !pizarraEstado.enCampo[j.id]);
-  const el = document.getElementById('pizarraBanquillo');
-  if(state.jugadores.length === 0){ el.innerHTML = '<p class="hint">Añade jugadores primero para poder colocarlos aquí.</p>'; return; }
-  el.innerHTML = disponibles.map(j => `
-    <div class="banquillo-token" onclick="meterAlCampo('${j.id}')">
-      <div class="slot-avatar">${pizarraAvatarHtml(j)}</div>
-      <div class="slot-name">${escapeHtml(formatName(j.nombre))}</div>
-    </div>`).join('') || '<p class="hint">Todo el mundo está ya en el campo.</p>';
-}
-function meterAlCampo(jid){
-  pizarraEstado.enCampo[jid] = {x: 50, y: 32};
-  renderPizarraBanquillo();
-  renderPizarraCampo();
-}
-function sacarDelCampo(jid){
-  delete pizarraEstado.enCampo[jid];
-  renderPizarraBanquillo();
-  renderPizarraCampo();
-}
-function renderPizarraBanquilloRival(){
-  const disponibles = Array.from({length:11}, (_,i)=>i+1).filter(n => !pizarraEstado.rivalEnCampo[n]);
-  const el = document.getElementById('pizarraBanquilloRival');
-  el.innerHTML = disponibles.map(n => `
-    <div class="banquillo-token" onclick="meterRivalAlCampo(${n})">
-      <div class="slot-avatar rival-avatar"><span>${n}</span></div>
-    </div>`).join('') || '<p class="hint">Los 11 están ya en el campo.</p>';
-}
-function meterRivalAlCampo(n){
-  pizarraEstado.rivalEnCampo[n] = {x: 50, y: 32};
-  renderPizarraBanquilloRival();
-  renderPizarraCampo();
-}
-function sacarRivalDelCampo(n){
-  delete pizarraEstado.rivalEnCampo[n];
-  renderPizarraBanquilloRival();
-  renderPizarraCampo();
-}
+function sacarDelCampo(jid){ delete pizarraEstado.enCampo[jid]; tpRenderBarra(); renderPizarraCampo(); }
+function sacarRivalDelCampo(n){ delete pizarraEstado.rivalEnCampo[n]; tpRenderBarra(); renderPizarraCampo(); }
 function renderPizarraCampo(){
   const wrap = document.getElementById('pizarraPitch');
-  wrap.querySelectorAll('.pizarra-token').forEach(el => el.remove());
+  if(!wrap) return;
+  wrap.querySelectorAll('.tp-token').forEach(el => el.remove());
   Object.keys(pizarraEstado.enCampo).forEach(jid => {
     const j = state.jugadores.find(x => x.id === jid);
     if(!j) return;
     const pos = pizarraEstado.enCampo[jid];
     const el = document.createElement('div');
-    el.className = 'pizarra-token';
-    el.style.left = pos.x + '%';
-    el.style.top = pos.y + '%';
-    el.dataset.jid = jid;
-    el.dataset.equipo = 'propio';
-    el.innerHTML = `<div class="slot-avatar">${pizarraAvatarHtml(j)}</div><div class="slot-name">${escapeHtml(formatName(j.nombre))}</div>`;
+    el.className = 'tp-token' + (tpEsPortero(j) ? ' gk' : '');
+    el.style.left = pos.x + '%'; el.style.top = pos.y + '%';
+    el.dataset.jid = jid; el.dataset.equipo = 'propio';
+    el.textContent = j.dorsal;
     el.addEventListener('pointerdown', iniciarArrastrePizarra);
     wrap.appendChild(el);
   });
   Object.keys(pizarraEstado.rivalEnCampo).forEach(n => {
     const pos = pizarraEstado.rivalEnCampo[n];
     const el = document.createElement('div');
-    el.className = 'pizarra-token';
-    el.style.left = pos.x + '%';
-    el.style.top = pos.y + '%';
-    el.dataset.jid = n;
-    el.dataset.equipo = 'rival';
-    el.innerHTML = `<div class="slot-avatar rival-avatar"><span>${n}</span></div>`;
+    el.className = 'tp-token rival';
+    el.style.left = pos.x + '%'; el.style.top = pos.y + '%';
+    el.dataset.jid = n; el.dataset.equipo = 'rival';
+    el.textContent = n;
     el.addEventListener('pointerdown', iniciarArrastrePizarra);
     wrap.appendChild(el);
   });
 }
+/* Arrastra con el dedo; un toque suelto (sin mover) saca la ficha del campo. */
 function iniciarArrastrePizarra(e){
   e.preventDefault();
   const el = e.currentTarget;
@@ -2905,16 +2947,16 @@ function iniciarArrastrePizarra(e){
   const wrap = document.getElementById('pizarraPitch');
   const startX = e.clientX, startY = e.clientY;
   let movio = false;
+  document.getElementById('tpMenu').classList.remove('open');
   try{ el.setPointerCapture(e.pointerId); }catch(err){}
   function mover(ev){
     if(Math.abs(ev.clientX-startX) > 4 || Math.abs(ev.clientY-startY) > 4) movio = true;
     const rect = wrap.getBoundingClientRect();
     let x = (ev.clientX - rect.left) / rect.width * 100;
     let y = (ev.clientY - rect.top) / rect.height * 100;
-    x = Math.max(3, Math.min(97, x));
-    y = Math.max(3, Math.min(97, y));
-    el.style.left = x + '%';
-    el.style.top = y + '%';
+    x = Math.max(-2, Math.min(102, x));
+    y = Math.max(-2, Math.min(102, y));
+    el.style.left = x + '%'; el.style.top = y + '%';
     const estado = esRival ? pizarraEstado.rivalEnCampo : pizarraEstado.enCampo;
     if(estado[el.dataset.jid]) estado[el.dataset.jid] = {x, y};
   }
@@ -4334,30 +4376,81 @@ async function guardarResultadosTest(testId){
 }
 
 /* ===================== ENTRENAMIENTOS: BIBLIOTECA DE EJERCICIOS ===================== */
-function renderEjerciciosList(){
-  const q = (document.getElementById('ejercicioBuscar').value || '').toLowerCase();
-  const filtered = state.ejercicios.filter(e => !q || e.titulo.toLowerCase().includes(q) || (e.categoria||'').toLowerCase().includes(q));
-  const el = document.getElementById('ejerciciosList');
-  if(state.ejercicios.length === 0){ el.innerHTML = '<div class="empty-state"><p>Aún no has añadido ningún ejercicio.</p></div>'; return; }
-  if(filtered.length === 0){ el.innerHTML = '<div class="empty-state"><p>No hay ejercicios que coincidan con la búsqueda.</p></div>'; return; }
-  el.innerHTML = filtered.map(e => `
+const EJ_CATEGORIAS_BASE = ['Finalización','Duelos','Partidos','Rondos','Posesiones','Físico-técnico','Juegos lúdicos','Ruedas de pases','Porteros','Juego de posición','Centros laterales','Defensa en bloque bajo','Contraataque','Cambios de orientación','Defensa en inferioridad','Juego interior','Progresión en el juego','Presión','Press pérdida','Tercer hombre','Transiciones','Salida de balón','Calentamiento','Trabajo táctico','Técnica individual'];
+const ejCatAbiertas = {};
+function ejCategoriasTodas(){
+  const m = new Map();
+  EJ_CATEGORIAS_BASE.forEach(c => m.set(normNombre(c), c));
+  state.ejercicios.forEach(e => { const c = (e.categoria || '').trim(); if(c && !m.has(normNombre(c))) m.set(normNombre(c), c); });
+  return [...m.values()].sort((a, b) => a.localeCompare(b, 'es'));
+}
+function toggleEjCat(k){ ejCatAbiertas[k] = !ejCatAbiertas[k]; renderEjerciciosList(); }
+function filaEjercicioHtml(e){
+  return `
     <div class="list-row">
-      <span class="list-name">
-        <a href="${escapeHtml(e.url)}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:600;">${escapeHtml(e.titulo)}</a>
-        ${e.categoria ? `<br><span class="muted small">${escapeHtml(e.categoria)}</span>` : ''}
-      </span>
+      <span class="list-name"><a href="${escapeHtml(e.url)}" target="_blank" rel="noopener" style="color:var(--navy);text-decoration:none;font-weight:600;">${escapeHtml(e.titulo)}</a></span>
       <div class="row-actions">
         <button class="icon-btn" onclick="abrirModalEjercicio('${e.id}')">✎</button>
         <button class="icon-btn danger" onclick="borrarEjercicio('${e.id}')">🗑</button>
       </div>
-    </div>`).join('');
+    </div>`;
+}
+function renderEjerciciosList(){
+  const q = normNombre(document.getElementById('ejercicioBuscar').value || '');
+  const filtered = state.ejercicios.filter(e => !q || normNombre(e.titulo).includes(q) || normNombre(e.categoria || '').includes(q));
+  const el = document.getElementById('ejerciciosList');
+  if(state.ejercicios.length === 0){ el.innerHTML = '<div class="empty-state"><p>Aún no has añadido ningún ejercicio.</p></div>'; return; }
+  if(filtered.length === 0){ el.innerHTML = '<div class="empty-state"><p>No hay ejercicios que coincidan con la búsqueda.</p></div>'; return; }
+  const canon = new Map(ejCategoriasTodas().map(c => [normNombre(c), c]));
+  const grupos = {};
+  filtered.forEach(e => {
+    const k = normNombre(e.categoria || '');
+    if(!grupos[k]) grupos[k] = {k, nombre: k ? (canon.get(k) || e.categoria) : 'Sin categoría', items: []};
+    grupos[k].items.push(e);
+  });
+  const lista = Object.values(grupos).sort((a, b) => ((a.k === '') - (b.k === '')) || a.nombre.localeCompare(b.nombre, 'es'));
+  el.innerHTML = lista.map(g => {
+    const abierto = !!q || !!ejCatAbiertas[g.k];
+    return `
+    <div class="ej-grupo ${abierto ? 'open' : ''}">
+      <div style="display:flex;align-items:center">
+        <button type="button" class="ej-head" onclick="toggleEjCat('${g.k.replace(/'/g, "\\'")}')">${escapeHtml(g.nombre)} <span class="ej-n">${g.items.length}</span><span class="mj-chev">▶</span></button>
+        ${g.k ? `<button type="button" class="ej-ren row-actions" title="Renombrar categoría" onclick="renombrarCategoriaEj('${g.k.replace(/'/g, "\\'")}')">✎</button>` : ''}
+      </div>
+      ${abierto ? `<div class="ej-body">${g.items.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es')).map(filaEjercicioHtml).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+/* Renombra una categoría en todos sus ejercicios a la vez (también sirve para unir dos categorías con el mismo nombre). */
+async function renombrarCategoriaEj(k){
+  const items = state.ejercicios.filter(e => normNombre(e.categoria || '') === k);
+  if(!items.length) return;
+  const actual = (items[0].categoria || '').trim();
+  const nuevo = prompt(`Nuevo nombre para la categoría «${actual}» (${items.length} ejercicio${items.length === 1 ? '' : 's'}):`, actual);
+  if(nuevo === null) return;
+  const nombre = nuevo.trim();
+  const canon = new Map(ejCategoriasTodas().map(c => [normNombre(c), c]));
+  const final = canon.get(normNombre(nombre)) || nombre;
+  for(const e of items){ e.categoria = final; await guardarColeccion(STORAGE_KEYS.ejercicios, {tipo:'upsert', item: e}); }
+  renderEjerciciosList();
+  showToast(final ? `Categoría renombrada a «${final}».` : 'Ejercicios sin categoría.');
+}
+function ejCatNuevaToggle(){
+  const v = document.getElementById('mEjCategoria').value;
+  document.getElementById('mEjCatNuevaWrap').style.display = v === '__nueva' ? 'block' : 'none';
 }
 function abrirModalEjercicio(id){
   const ej = id ? state.ejercicios.find(e => e.id === id) : null;
+  const claveActual = normNombre(ej ? (ej.categoria || '') : '');
   openModal(`
     <h3>${ej ? 'Editar ejercicio' : 'Añadir ejercicio'}</h3>
     <label>Título<input type="text" id="mEjTitulo" value="${ej ? escapeHtml(ej.titulo) : ''}" placeholder="Ej: Rondos 4v2"></label>
-    <label>Categoría (opcional)<input type="text" id="mEjCategoria" value="${ej ? escapeHtml(ej.categoria||'') : ''}" placeholder="Técnica, Físico, Táctica..."></label>
+    <label>Categoría<select id="mEjCategoria" onchange="ejCatNuevaToggle()">
+      <option value="">Sin categoría</option>
+      ${ejCategoriasTodas().map(c => `<option value="${escapeHtml(c)}" ${normNombre(c) === claveActual ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('')}
+      <option value="__nueva">➕ Nueva categoría…</option>
+    </select></label>
+    <label id="mEjCatNuevaWrap" style="display:none">Nombre de la categoría nueva<input type="text" id="mEjCatNueva" placeholder="Ej: Balón parado"></label>
     <label>Enlace (TikTok, TopLiderCoach...)<input type="url" id="mEjUrl" value="${ej ? escapeHtml(ej.url) : ''}" placeholder="https://..."></label>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -4366,7 +4459,9 @@ function abrirModalEjercicio(id){
 }
 async function guardarEjercicio(id){
   const titulo = document.getElementById('mEjTitulo').value.trim();
-  const categoria = document.getElementById('mEjCategoria').value.trim();
+  let categoria = document.getElementById('mEjCategoria').value;
+  if(categoria === '__nueva') categoria = document.getElementById('mEjCatNueva').value.trim();
+  categoria = (new Map(ejCategoriasTodas().map(c => [normNombre(c), c]))).get(normNombre(categoria)) || categoria;
   const url = document.getElementById('mEjUrl').value.trim();
   if(!titulo || !url){ showToast('Completa al menos el título y el enlace.'); return; }
   let ejFinal;
