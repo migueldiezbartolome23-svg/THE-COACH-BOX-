@@ -461,12 +461,14 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 .tp-token:active{cursor:grabbing;z-index:6;}
 .tp-token.gk{background:radial-gradient(circle at 35% 30%,#8fcaff,#3a82d2);}
 .tp-token.rival{background:repeating-linear-gradient(90deg,#f0703c 0 18%,#a8321a 18% 36%);border-color:#5a1a0c;}
+.tp-token.foto{background-size:cover;background-position:center;background-repeat:no-repeat;border-color:#fff;}
+.tp-num{position:absolute;right:-5px;bottom:-5px;min-width:calc(var(--tk,40px) * .42);height:calc(var(--tk,40px) * .42);padding:0 3px;border-radius:20px;background:#16294f;border:1.5px solid #fff;color:#fff;font-size:calc(var(--tk,40px) * .27);line-height:1;display:flex;align-items:center;justify-content:center;text-shadow:none;}
 .tp-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:#1c1c1e;-webkit-overflow-scrolling:touch;flex-shrink:0;}
 .tp-bt{flex:0 0 74px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px 6px;border-radius:12px;background:#4a73b0;cursor:pointer;color:#fff;border:none;}
 .tp-bt.usado{background:#3a3a3d;opacity:.8;}
 .tp-bt.rival{background:#b0402a;}
 .tp-bt.rival.usado{background:#3a3a3d;}
-.tp-bt .tp-token{position:static;transform:none;width:44px;height:44px;font-size:22px;cursor:pointer;}
+.tp-bt .tp-token{--tk:44px;position:static;transform:none;width:44px;height:44px;font-size:22px;cursor:pointer;}
 .tp-bt small{font-size:11px;font-weight:600;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 @media (min-width:700px){
@@ -778,7 +780,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '15/11/2026 - 12:00 The Coach Box';
+const APP_VERSION = '15/11/2026 - 12:30 The Coach Box';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -2897,8 +2899,14 @@ function tpRenderBarra(){
   if(!state.jugadores.length){ el.innerHTML = '<p style="color:#fff;margin:8px">Añade jugadores primero para poder colocarlos aquí.</p>'; return; }
   el.innerHTML = [...state.jugadores].sort(comparaPosicion).map(j => {
     const usado = !!pizarraEstado.enCampo[j.id];
-    return `<button type="button" class="tp-bt ${usado ? 'usado' : ''}" onclick="tpToggleJugador('${j.id}')"><div class="tp-token ${tpEsPortero(j) ? 'gk' : ''}">${escapeHtml(String(j.dorsal))}</div><small>${escapeHtml(formatName(j.nombre))}</small></button>`;
+    return `<button type="button" class="tp-bt ${usado ? 'usado' : ''}" onclick="tpToggleJugador('${j.id}')">${tpFichaHtml(j, '')}<small>${escapeHtml(formatName(j.nombre))}</small></button>`;
   }).join('');
+}
+/* Si el jugador tiene foto, la ficha muestra la foto (con su dorsal pequeño); si no, la ficha normal con el número. */
+function tpFichaHtml(j, extraClase){
+  const gk = tpEsPortero(j) ? ' gk' : '';
+  if(j.foto) return `<div class="tp-token foto ${extraClase || ''}" style="background-image:url('${escapeHtml(j.foto)}')"><span class="tp-num">${escapeHtml(String(j.dorsal))}</span></div>`;
+  return `<div class="tp-token${gk} ${extraClase || ''}">${escapeHtml(String(j.dorsal))}</div>`;
 }
 function tpToggleJugador(jid){
   if(pizarraEstado.enCampo[jid]) delete pizarraEstado.enCampo[jid];
@@ -2921,10 +2929,15 @@ function renderPizarraCampo(){
     if(!j) return;
     const pos = pizarraEstado.enCampo[jid];
     const el = document.createElement('div');
-    el.className = 'tp-token' + (tpEsPortero(j) ? ' gk' : '');
+    el.className = 'tp-token' + (j.foto ? ' foto' : (tpEsPortero(j) ? ' gk' : ''));
     el.style.left = pos.x + '%'; el.style.top = pos.y + '%';
     el.dataset.jid = jid; el.dataset.equipo = 'propio';
-    el.textContent = j.dorsal;
+    if(j.foto){
+      el.style.backgroundImage = `url('${j.foto}')`;
+      const n = document.createElement('span'); n.className = 'tp-num'; n.textContent = j.dorsal; el.appendChild(n);
+    } else {
+      el.textContent = j.dorsal;
+    }
     el.addEventListener('pointerdown', iniciarArrastrePizarra);
     wrap.appendChild(el);
   });
