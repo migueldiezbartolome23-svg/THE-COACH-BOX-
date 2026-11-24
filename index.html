@@ -780,7 +780,7 @@ details.card summary b{font-weight:600;color:var(--muted);font-size:13px;}
 
 <script>
 /* ===================== CONSTANTES Y ESTADO ===================== */
-const APP_VERSION = '15/11/2026 - 12:30 The Coach Box';
+const APP_VERSION = '20/11/2026 - 12:00 The Coach Box';
 const STORAGE_PREFIX = 'cdsp_cadeteA_';
 
 const FIREBASE_CONFIG = {
@@ -2584,7 +2584,8 @@ async function enviarVoto(){
 /* ===================== SORTEO DE EQUIPOS (Entrenamientos) ===================== */
 const SORTEO_KEY = 'cdsp_sorteo_v1';
 const SORTEO_COLORES = ['#0F1E3D','#D22630','#3B5BA9','#A81B24','#5C6B8A','#E0646C','#17294D','#8A93A6'];
-let sorteo = {sel:{}, guests:[], k:2, rules:[]};
+let sorteo = {sel:{}, guests:[], k:2, rules:[], comodin:true};
+let sorteoComodin = null;
 let sorteoUltimo = null;
 
 function sorteoAbierto(){ return !document.getElementById('sorteoPage').classList.contains('hidden'); }
@@ -2596,6 +2597,7 @@ function cargarSorteo(){
       sorteo.guests = Array.isArray(s.guests) ? s.guests.filter(g => g && g.id && g.nombre) : [];
       sorteo.k = Number(s.k) || 2;
       sorteo.rules = Array.isArray(s.rules) ? s.rules.filter(r => Array.isArray(r) && r.length === 2) : [];
+      sorteo.comodin = s.comodin !== false;
     }
   }catch(e){}
   state.jugadores.forEach(j => { if(sorteo.sel[j.id] === undefined) sorteo.sel[j.id] = !j.filial; });
@@ -2632,6 +2634,10 @@ function abrirSorteo(){
         <output id="sorK">2</output>
         <button type="button" class="btn-secondary" id="sorMas" onclick="sorteoK(1)" aria-label="Un equipo más">+</button>
         <span class="muted" id="sorTam"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="flex:1"><strong style="font-size:14px;color:var(--navy)">🃏 Comodín si son impares</strong><br><span class="muted small">Un mediocentro (MCD, MC o MCO) juega con los dos equipos. Solo con 2 equipos.</span></div>
+        <label class="switch"><input type="checkbox" id="sorComodin" ${sorteo.comodin ? 'checked' : ''} onchange="sorteoComodinToggle(this.checked)"><span class="slider"></span></label>
       </div>
     </div>
     <div class="card">
@@ -2688,6 +2694,7 @@ function renderSorteoEquipos(){
   let t;
   if(n >= sorteo.k){ const base = Math.floor(n / sorteo.k), extra = n % sorteo.k; t = extra === 0 ? `de ${base} jugadores` : `de ${base} o ${base + 1} jugadores`; }
   else t = 'faltan jugadores';
+  if(sorteo.comodin && sorteo.k === 2 && n >= 3 && n % 2 === 1) t = `de ${(n - 1) / 2} jugadores + 🃏 comodín`;
   document.getElementById('sorTam').textContent = t;
 }
 function renderSorteoReglas(){
@@ -2710,6 +2717,7 @@ function renderSorteoReglas(){
 }
 function sorteoMarcar(v){ sorteoLista().forEach(p => { sorteo.sel[p.id] = v; }); sorteoCambio(); renderSorteo(); }
 function sorteoToggle(id, v){ sorteo.sel[id] = v; sorteoCambio(); renderSorteoJugadores(); renderSorteoEquipos(); renderSorteoReglas(); }
+function sorteoComodinToggle(v){ sorteo.comodin = v; sorteoCambio(); renderSorteoEquipos(); }
 function sorteoK(d){ sorteo.k += d; sorteoCambio(); renderSorteoEquipos(); }
 function sorteoAddInvitado(){
   const inp = document.getElementById('sorInvitado');
@@ -2770,24 +2778,42 @@ function sorteoConstruir(ids, k, reglas){
   }
   return null;
 }
+/* Con un número impar de jugadores, un mediocentro (MCD, MC o MCO) hace de comodín y juega con los dos equipos. */
+function sorteoElegirComodin(part, reglas){
+  const esMedio = p => { const j = state.jugadores.find(x => x.id === p.id); return !!j && posicionesJugador(j).some(pos => POS_MEDIOS.includes(pos)); };
+  let candidatos = part.filter(esMedio), sinMedios = false;
+  if(!candidatos.length){ sinMedios = true; candidatos = part.filter(p => !p.guest); if(!candidatos.length) candidatos = part; }
+  const sinRegla = candidatos.filter(p => !reglas.some(r => r[0] === p.id || r[1] === p.id));
+  const pool = sinRegla.length ? sinRegla : candidatos;
+  return {p: pool[Math.floor(Math.random() * pool.length)], sinMedios};
+}
 function sortear(){
   const part = sorteoParticipantes();
   const box = document.getElementById('sorResultados');
   const fallo = t => { sorteoUltimo = null; box.innerHTML = `<p class="sor-msg" style="margin:14px 0">${t}</p>`; };
   if(part.length < 2){ fallo('Marca al menos dos jugadores.'); return; }
   if(part.length < sorteo.k){ fallo('Hay menos jugadores que equipos. Baja el número de equipos.'); return; }
-  const ids = part.map(p => p.id);
-  const activas = sorteo.rules.filter(r => ids.includes(r[0]) && ids.includes(r[1]));
+  let ids = part.map(p => p.id);
+  let activas = sorteo.rules.filter(r => ids.includes(r[0]) && ids.includes(r[1]));
+  let comodin = null, comodinSinMedios = false;
+  if(sorteo.comodin && sorteo.k === 2 && part.length >= 3 && part.length % 2 === 1){
+    const c = sorteoElegirComodin(part, activas);
+    comodin = c.p; comodinSinMedios = c.sinMedios;
+    ids = ids.filter(id => id !== comodin.id);
+    activas = activas.filter(r => r[0] !== comodin.id && r[1] !== comodin.id);
+  }
   const equipos = sorteoConstruir(ids, sorteo.k, activas);
   if(!equipos){ fallo('Con estas reglas no hay ningún reparto posible. Quita alguna regla o usa menos equipos.'); return; }
   const nom = {}; part.forEach(p => { nom[p.id] = p.nombre; });
   sorteoUltimo = equipos.map(t => t.map(id => nom[id]));
+  sorteoComodin = comodin ? comodin.nombre : null;
   box.innerHTML = `
     <div class="sor-grid">${sorteoUltimo.map((t,i) => `
       <div class="sor-team" style="--tc:${SORTEO_COLORES[i % 8]}">
-        <h4><span class="sor-badge">${i + 1}</span>Equipo ${i + 1}<small>${t.length} jug.</small></h4>
-        <ul>${t.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul>
+        <h4><span class="sor-badge">${i + 1}</span>Equipo ${i + 1}<small>${t.length} jug.${sorteoComodin ? ' + 🃏' : ''}</small></h4>
+        <ul>${t.map(m => `<li>${escapeHtml(m)}</li>`).join('')}${sorteoComodin ? `<li style="color:var(--red-dark);font-weight:700">🃏 ${escapeHtml(sorteoComodin)} (comodín)</li>` : ''}</ul>
       </div>`).join('')}</div>
+    ${sorteoComodin ? `<p class="hint" style="text-align:center;margin:0 0 10px">🃏 <strong>${escapeHtml(sorteoComodin)}</strong> juega con los dos equipos${comodinSinMedios ? ' (no había mediocentros marcados, se ha elegido a otro jugador)' : ''}.</p>` : ''}
     <div class="sor-actions">
       <button type="button" class="btn-secondary" onclick="sortear()">🔄 Volver a sortear</button>
       <button type="button" class="btn-secondary" onclick="sorteoCopiar()">Copiar</button>
@@ -2795,7 +2821,7 @@ function sortear(){
     </div>`;
   box.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
-function sorteoTexto(){ return sorteoUltimo.map((t,i) => 'Equipo ' + (i + 1) + ': ' + t.join(', ')).join('\n'); }
+function sorteoTexto(){ return sorteoUltimo.map((t,i) => 'Equipo ' + (i + 1) + ': ' + t.join(', ') + (sorteoComodin ? ' + 🃏 ' + sorteoComodin : '')).join('\n') + (sorteoComodin ? '\nComodín (juega con los dos): ' + sorteoComodin : ''); }
 async function sorteoCopiar(){
   if(!sorteoUltimo) return;
   try{ await navigator.clipboard.writeText(sorteoTexto()); showToast('Equipos copiados.'); }
